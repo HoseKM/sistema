@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>Menu</title>
+    <script src="js/seguridad.js"></script>
+    <link rel="icon" type="image/png" href="img/ajustes.png">
+
+    <!-- ESTILOS -->
+    <link href="menu/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+</head>
+
+<body class="sb-nav-fixed">
+    <!-- BARRA SUPERIOR (NAVBAR) -->
+    <div id="contenedor-navbar"></div>
+
+    <div id="layoutSidenav">
+        <!-- MENÚ LATERAL (SIDEBAR) -->
+        <div id="layoutSidenav_nav">
+            <div id="contenedor-sidebar"></div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div id="layoutSidenav_content">
+            <main>
+                <div id="contenedor-principal" class="container-fluid px-4">
+                    <!-- Aquí se cargarán los módulos dinámicamente -->
+                    <h1 class="mt-4">Bienvenido</h1>
+                    <p>Seleccione una opción del menú para comenzar.</p>
+                </div>
+            </main>
+
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2026</div>
+                        <div>
+                            <a href="#">Privacy Policy</a> &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+     <script src="js/seguridad.js"></script>
+    <script src="js/funcionesSistema.js"></script>
+    <script src="menu/bootstrap.bundle.min.js"></script>
+    <script src="menu/scripts.js"></script>
+    <script src="alert/alertify.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        // Se obtienen los datos del loggin
+        const nombre = localStorage.getItem("nomUsuario");
+        const rol = localStorage.getItem("rolUsuario");
+           
+        if (!nombre) {
+        // Si no hay sesión, redirige al login
+            window.location.href = "error.html";
+            return;
+        } 
+        // --- AQUÍ EMPIEZA EL CAMBIO ---
+        // Usamos setInterval para esperar a que el Sidebar cargue sus IDs
+        const verificarSidebar = setInterval(function () {
+        const divUsuario = document.getElementById("txtNombreUsuario");
+        const divRol = document.getElementById("txtRolUsuario");
+
+        // ¿Ya existen los elementos en el HTML?
+        if (divUsuario && divRol) {
+            // ¡Sí! Entonces detenemos el reloj (intervalo)
+            clearInterval(verificarSidebar);
+
+            // Ahora sí, ponemos los textos
+            divUsuario.textContent = nombre;
+            divRol.textContent = rol;
+
+            // Y aplicamos las restricciones
+            aplicarRestricciones(rol);
+        }
+        }, 100); // Revisa cada 100 milisegundos
+        function aplicarRestricciones(rol) {
+        console.log("Rol detectado para permisos: " + rol);
+            }
+    });
+        // Verificación de sesión inmediata
+        const nom = localStorage.getItem("nomUsuario");
+        if (!nom) {
+            window.location.href = "error.html";
+        }
+
+        // Función para cargar módulos (Contenido dinámico)
+        function cargarModulo(url) {
+            const contenedor = document.getElementById('contenedor-principal');
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar el módulo');
+                    return response.text();
+                })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const nuevoContenido = doc.querySelector('main') || doc.body;
+                    
+                    contenedor.innerHTML = nuevoContenido.innerHTML;
+
+                    // Ejecutar scripts del módulo cargado
+                    const scripts = nuevoContenido.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.textContent = oldScript.textContent;
+                        document.body.appendChild(newScript);
+                        // Opcional: eliminar el script después de ejecutarlo para no ensuciar el DOM
+                        newScript.remove(); 
+                    });
+
+                    // Cerrar sidebar en móviles
+                    if (document.body.classList.contains('sb-sidenav-toggled')) {
+                        document.body.classList.remove('sb-sidenav-toggled');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alertify.error("Error al cargar el módulo");
+                });
+        }
+
+        // Función para cargar Navbar y Sidebar (Componentes fijos)
+        function cargarComponentes() {
+            // Carga el Navbar
+    fetch('navbar.html')
+        .then(res => res.text())
+        .then(data => document.getElementById('contenedor-navbar').innerHTML = data);
+
+    // Carga el Sidebar
+    fetch('sidebar.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('contenedor-sidebar').innerHTML = data;
+            
+            // --- MOSTRAR USUARIO Y ROL ---
+            const nombre = localStorage.getItem("nomUsuario");
+            const contenedor = document.getElementById('txtNombreUsuario');
+
+            if (contenedor) {
+                // Insertamos solo el texto del nombre
+                contenedor.innerText = nombre ? nombre : 'Invitado';
+            }
+        });
+        }
+
+        // Inicialización
+        document.addEventListener("DOMContentLoaded", cargarComponentes);
+    </script>
+</body>
+</html>

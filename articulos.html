@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Punto Elegancia - Artículos</title>
+    <script src="js/seguridad.js"></script>
+    <link rel="icon" type="image/png" href="img/ajustes.png">
+    <link href="menu/styles.css" rel="stylesheet" />
+    <!-- BOOTSTRAP ICONS -->
+          <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+          <!-- DATATABLES -->
+          <link rel="stylesheet" href="dt/datatables.min.css">
+          <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+          <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+          <!-- ALERTIFYJS -->
+          <link rel="stylesheet" href="alert/alertify.min.css">
+          <link rel="stylesheet" href="alert/themes/default.min.css">
+          <script src="alert/alertify.min.js"></script>
+    
+</head>
+<body class="sb-nav-fixed">
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-2">Mantenimiento de Artículos</h1>
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-box-seam me-1"></i> Mantenimiento de Artículos</span>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoArticulo">
+                                <i class="bi bi-plus-circle"></i> Nuevo Artículo
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <table id="tabla_articulos" class="display compact table table-hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Código</th>
+                                        <th>Descripción</th>
+                                        <th>Marca</th>
+                                        <th>Categoría</th>
+                                        <th>Costo Proveedor</th>
+                                        <th>Venta</th>
+                                        <th>Stock</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+        <div class="modal fade" id="modalNuevoArticulo" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <form id="formNuevoArticulo" class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Registrar Nuevo Artículo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Código de Barras</label>
+                            <input type="text" id="new_codbarra" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" id="new_descripcion" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Costo (Gs)</label>
+                                <input type="number" id="new_costo" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Venta (Gs)</label>
+                                <input type="number" id="new_preventa" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Stock Actual</label>
+                            <input type="number" id="new_stockactual" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <footer class="py-4 bg-light mt-auto">
+            </footer>
+    </div> </div> <script src="dt/jquery-3.7.1.js"></script>
+
+    <div class="modal fade" id="modalEditarArticulo" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <form id="formEditarArticulo" class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Modificar Artículo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit_idarticulo">
+                    <div class="mb-3">
+                        <label class="form-label">Descripción del Producto</label>
+                        <input type="text" id="edit_descripcion" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Costo (Gs)</label>
+                            <input type="number" id="edit_costo" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Venta (Gs)</label>
+                            <input type="number" id="edit_preventa" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Actual</label>
+                        <input type="number" id="edit_stockactual" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <script src="js/seguridad.js"></script>
+          <script src="js/funcionesSistema.js"></script>
+          <!-- MENU -->
+          <script src="menu/bootstrap.bundle.min.js"></script>
+          <script src="menu/scripts.js"></script>
+          <!-- DATATABLES -->
+          <script src="dt/jquery-3.7.1.js"></script>
+          <script src="dt/datatables.min.js"></script>
+          <script src="dt/jquery.dataTables.min.js"></script>
+          <!-- DATATABLES Buttons extension -->
+          <script src="dt/dataTables.buttons.min.js"></script>
+          <script src="dt/buttons.print.min.js"></script>
+          <script src="dt/buttons.html5.min.js"></script>
+          <!-- DATATABLES JSZip y pdfmake para exportar -->
+          <script src="dt/jszip.min.js"></script>
+          <script src="dt/pdfmake.min.js"></script>
+          <script src="dt/vfs_fonts.js"></script>
+          <!-- DATATABLES Idioma Español -->
+          <script src="dt/es-ES.js"></script>
+
+    <script>
+    // Variables Globales
+    var articulos = [];
+    var tabla;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Cargar componentes (Navbar/Sidebar)
+        cargarComponentes();
+
+        // 2. Inicializar Datos desde BD o LocalStorage
+        // Importante: Llamamos a la función datos() de tu bd.js si existe
+        if (typeof datos === "function") { 
+            datos(); 
+        }
+
+        // Recuperar del LocalStorage o usar los de bd.js (lista_articulos)
+        const storageArt = localStorage.getItem("articulos");
+        if (storageArt) {
+            articulos = JSON.parse(storageArt);
+        } else if (typeof lista_articulos !== 'undefined') {
+            articulos = lista_articulos;
+            localStorage.setItem("articulos", JSON.stringify(articulos));
+        }
+
+        // 3. Cargar la Tabla
+        cargarTablaArticulos();
+
+        // --- EVENTO GUARDAR NUEVO ---
+        $('#formNuevoArticulo').on('submit', function (e) {
+            e.preventDefault();
+            // Capturamos los valores
+            const desc = $('#new_descripcion').val();
+            const cod = $('#new_codbarra').val();
+            // Validación de seguridad para evitar el error de tu captura
+            if (!desc || !cod) {
+             alertify.error("Por favor, complete la descripción y el código");
+            return;
+             }
+            const nuevoId = articulos.length > 0 ? Math.max(...articulos.map(a => a.idarticulo)) + 1 : 1;
+            
+             const nuevoArt = {
+                idarticulo: nuevoId,
+                codbarra: $('#new_codbarra').val(),
+                descripcion: $('#new_descripcion').val().toUpperCase(),
+                idmarca: parseInt($('#new_idmarca').val()),
+                nom_marca: $("#new_idmarca option:selected").text(), // Captura el texto (ZARA, NIKE, etc.)
+                idclasificacion: parseInt($('#new_idclasificacion').val()),
+                nom_clasificacion: $("#new_idclasificacion option:selected").text(), // Captura el texto (REMERAS, JEANS, etc.)
+                costo: parseFloat($('#new_costo').val()),
+                preventa: parseFloat($('#new_preventa').val()),
+                stockactual: parseInt($('#new_stockactual').val())
+            };
+
+            articulos.push(nuevoArt);
+            localStorage.setItem('articulos', JSON.stringify(articulos)); // Guardar
+            tabla.clear().rows.add(articulos).draw(); // Refrescar tabla
+            guardarYRefrescar("Artículo registrado con éxito");
+            $('#modalNuevoArticulo').modal('hide');
+            this.reset();
+            alertify.success("Artículo registrado con éxito");
+        });
+
+        // --- EVENTO GUARDAR EDICIÓN ---
+        $('#formEditarArticulo').on('submit', function (e) {
+            e.preventDefault();
+            const id = $('#edit_idarticulo').val();
+            const index = articulos.findIndex(a => a.idarticulo == id);
+
+            if (index !== -1) {
+                articulos[index].descripcion = $('#edit_descripcion').val().toUpperCase();
+                articulos[index].costo = parseFloat($('#edit_costo').val());
+                articulos[index].preventa = parseFloat($('#edit_preventa').val());
+                articulos[index].stockactual = parseInt($('#edit_stockactual').val());
+
+                guardarYRefrescar("Artículo actualizado");
+                $('#modalEditarArticulo').modal('hide');
+            }
+        });
+    });
+
+    function cargarTablaArticulos() {
+        if ($.fn.DataTable.isDataTable('#tabla_articulos')) {
+            $('#tabla_articulos').DataTable().destroy();
+        }
+
+        tabla = $('#tabla_articulos').DataTable({
+            data: articulos,
+            columns: [
+                { data: 'idarticulo' },
+                { data: 'codbarra' },
+                { data: 'descripcion' },
+                { data: 'nom_marca' },
+                { data: 'nom_clasificacion' },
+                { 
+                    data: 'costo', 
+                    render: (d) => 'Gs ' + parseFloat(d || 0).toLocaleString('es-PY') 
+                },
+                { 
+                    data: 'preventa', 
+                    render: (d) => 'Gs ' + parseFloat(d || 0).toLocaleString('es-PY') 
+                },
+                { data: 'stockactual', className: 'text-center' },
+                {
+                    data: null,
+                    className: 'text-center',
+                    render: function(row) {
+                        return `
+                            <div class="btn-group">
+                                <button class="btn btn-outline-warning btn-sm btn-editar" data-id="${row.idarticulo}"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-outline-danger btn-sm btn-eliminar" data-id="${row.idarticulo}"><i class="bi bi-trash"></i></button>
+                            </div>`;
+                    }
+                }
+            ],
+            dom: 'Bfrtip', 
+            buttons: [
+            {
+                extend: 'copy',
+                text: '<i class="bi bi-clipboard"></i> Copiar',
+                className: 'btn btn-secondary btn-sm',
+                exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
+            },
+            {
+                extend: 'excel',
+                text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                title: 'PUNTO ELEGANCIA - REPORTE ARTÍCULOS',
+                filename: 'Punto_Elegancia_Articulos',
+                exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                orientation: 'landscape',
+                pageSize:'A4',
+                title: '', //aqui ira el membrete
+                exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] },
+                customize: function (doc) {
+                // --- MEMBRETE Y LOGO ---
+                // doc.content[0] es el título, lo reemplazamos por un diseño profesional
+                doc.content.splice(0, 0, {
+                    margin: [0, 0, 0, 12],
+                    table: {
+                        widths: [80, '*', 'auto'],
+                        body: [
+                            [
+                                // Aquí iría tu logo en Base64 (puedes dejarlo vacío o poner texto)
+                                { text: 'PUNTO\nELEGANCIA', fontSize: 14, bold: true, color: '#4e73df', alignment: 'center' },
+                                {
+                                    stack: [
+                                        { text: 'REPORTE ARTICULOS', fontSize: 16, bold: true },
+                                        { text: 'Venta de Ropa y Accesorios', fontSize: 10, color: '#666' },
+                                        { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                    ],
+                                    alignment: 'left',
+                                    margin: [10, 0, 0, 0]
+                                },
+                                {
+                                    stack: [
+                                        { text: 'INFORME DE ARTÍCULOS', fontSize: 12, bold: true, alignment: 'right' },
+                                        { text: 'Fecha: ' + new Date().toLocaleDateString(), fontSize: 10, alignment: 'right' },
+                                        { text: 'Hora: ' + new Date().toLocaleTimeString(), fontSize: 10, alignment: 'right' }
+                                    ]
+                                }
+                            ]
+                        ]
+                    },
+                    layout: 'noBorders'
+                });
+                // --- NÚMERO DE PÁGINA (FOOTER) ---
+                var objLayout = {};
+                objLayout['hLineWidth'] = function(i) { return .5; };
+                objLayout['vLineWidth'] = function(i) { return .5; };
+                objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                objLayout['paddingLeft'] = function(i) { return 4; };
+                objLayout['paddingRight'] = function(i) { return 4; };
+                doc.content[1].layout = objLayout; // Aplica bordes finos a la tabla de datos
+
+                doc['footer'] = (function(page, pages) {
+                    return {
+                        columns: [
+                            {
+                                alignment: 'left',
+                                text: ['Impreso por: ', { text: localStorage.getItem("nomUsuario") || 'Sistema' }]
+                            },
+                            {
+                                alignment: 'right',
+                                text: ['Página ', { text: page.toString() }, ' de ', { text: pages.toString() }]
+                            }
+                        ],
+                        margin: [40, 0],
+                        fontSize: 9
+                    }
+                });
+            }
+            },
+            {
+                extend: 'print',
+                text: '<i class="bi bi-printer"></i> Imprimir',
+                className: 'btn btn-info btn-sm',
+                exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
+            }
+        ],
+        language: spanish
+    });
+}
+
+
+
+    function guardarYRefrescar(mensaje) {
+        localStorage.setItem('articulos', JSON.stringify(articulos));
+        tabla.clear().rows.add(articulos).draw();
+        alertify.success(mensaje);
+    }
+
+    // Eventos delegados para botones de fila
+    $(document).on('click', '.btn-editar', function() {
+        const id = $(this).data('id');
+        const art = articulos.find(a => a.idarticulo == id);
+        if (art) {
+            $('#edit_idarticulo').val(art.idarticulo);
+            $('#edit_descripcion').val(art.descripcion);
+            $('#edit_costo').val(art.costo);
+            $('#edit_preventa').val(art.preventa);
+            $('#edit_stockactual').val(art.stockactual);
+            $('#modalEditarArticulo').modal('show');
+        }
+    });
+
+    $(document).on('click', '.btn-eliminar', function() {
+        const id = $(this).data('id');
+        alertify.confirm("Eliminar", "¿Seguro que desea eliminar este artículo?", 
+        function() {
+            articulos = articulos.filter(a => a.idarticulo != id);
+            guardarYRefrescar("Eliminado correctamente");
+        }, null);
+    });
+    
+</script>
+</body>
+</html>
