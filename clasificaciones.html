@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Clasificacion</title>
+    <link rel="icon" type="image/png" href="img/working.png">
+    <script src="js/seguridad.js"></script>
+    <!-- ESTILOS DEL MENU -->
+    <link href="menu/styles.css" rel="stylesheet" />
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="dt/datatables.min.css">
+    <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+    <!-- ALERTIFYJS -->
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+    <script src="alert/alertify.min.js"></script>
+    
+    <!-- Mantenimiento de marcas  -->
+</head>
+<body class="sb-nav-fixed">
+    <!-- Mantenimiento de Clasificaciones -->
+        <!-- ======================================================== -->
+        <!-- 1. CONTENEDOR DINÁMICO PARA LA BARRA SUPERIOR (NAVBAR)   -->
+        <!-- Este div vacío será llenado por JavaScript usando fetch()-->
+        <!-- con el contenido del archivo 'navbar.html'.              -->
+        <!-- ======================================================== -->
+        <div id="contenedor-navbar"></div>
+        <div id="layoutSidenav">
+            <!-- ======================================================== -->
+            <!-- 2. CONTENEDOR DINÁMICO PARA EL MENÚ LATERAL (SIDEBAR)    -->
+            <!-- Este div vacío será llenado por JavaScript usando fetch()-->
+            <!-- con el contenido del archivo 'sidebar.html'.             -->
+            <!-- ======================================================== -->
+            <div id="contenedor-sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                        <!-- AQUÍ VA TODO LO QUE SE VA A VISUALIZAR EN LA PÁGINA -->
+                        <!-- CUERPO DEL DASHBOARD -->
+                <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-2">Clasificaciones</h1>
+                            <div class="row">
+                                <table id="tabla_clasificacion" class="display compact" style="width:100%">
+                                    <thead>
+                                            <tr>
+                                                <th>Id Clasificación</th>
+                                                <th>Clasificación</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                        <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Your Website 2026</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                        </div>
+                </footer>
+            </div>
+        </div>
+
+    <!-- nueva clasificacion modal -->
+    <div class="modal fade" id="modalNuevaClasificacion" tabindex="-1"
+    aria-labelledby="modalClasificacionLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <form id="formNuevaClasificacion" class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalClasificacionLabel">
+                            <i class="bi bi-person-plus-fill"></i> Agregar Nueva Clasificación</h5>
+                        <button type="button" class="btn-close btn-close-white" 
+                        data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Clasificación</label>
+                            <input type="text" id="clasificacion" class="form-control text-uppercase" required minlength="4" maxlength="50">
+                        </div>
+                        
+                </div>
+                <div class="modal-footer">
+                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Guardar Clasificación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Editar Clasificación -->
+    <div class="modal fade" id="modalEditarClasificacion" tabindex="-1" 
+    aria-labelledby="modalEditarClasificacionLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <form id="formEditarClasificacion" class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="modalEditarClasificacionLabel"><i class="bi bi-pencil-square"></i> Editar Clasificación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                        <input type="hidden" id="edit_idclasificacion">
+                        <div class="mb-2">
+                            <label class="form-label">Clasificación</label>
+                            <input type="text" id="edit_clasificacion" class="form-control text-uppercase" required minlength="4" maxlength="50">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-warning"><i class="bi bi-floppy"></i> Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Eliminar Clasificacion -->
+<div class="modal fade" id="modalEliminarClasificacion" tabindex="-1"
+aria-labelledby="modalEliminarClasificacionLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="modalEliminarClasificacionLabel">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Eliminar Clasificacion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                    <p class="text-center fw-bold">¿Deseas proceder con la eliminación?</p>
+                    <input type="hidden" id="del_idclasificacion">
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item"><strong>Clasificación:</strong> <span id="del_clasificacion"></span></li>
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar"><i class="bi bi-trash"></i> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <script src="js/funcionesSistema.js"></script>
+        <!-- MENU -->
+        <script src="menu/bootstrap.bundle.min.js"></script>
+        <script src="menu/scripts.js"></script>
+        <!-- DATATABLES -->
+        <script src="dt/jquery-3.7.1.js"></script>
+        <script src="dt/datatables.min.js"></script>
+        <script src="dt/jquery.dataTables.min.js"></script>
+        <!-- DATATABLES Buttons extension -->
+        <script src="dt/dataTables.buttons.min.js"></script>
+        <script src="dt/buttons.print.min.js"></script>
+        <script src="dt/buttons.html5.min.js"></script>
+        <!-- DATATABLES JSZip y pdfmake para exportar -->
+        <script src="dt/jszip.min.js"></script>
+        <script src="dt/pdfmake.min.js"></script>
+        <script src="dt/vfs_fonts.js"></script>
+        <!-- DATATABLES Idioma Español -->
+        <script src="dt/es-ES.js"></script>
+<script>
+               //Al cargarse la página---------------------------------------------------------------------------
+               //Control de seguridad en la apertura de la página------------------------------------------------
+            var nom = localStorage.getItem("nomUsuario");
+            if (nom == "" || nom == null){
+                window.location.href = "error.html"; // Redirige al login
+            }
+            //Fin del Control de seguridad en la apertura de la página----------------------------------------
+            
+            //------------------------------------------------------------------------------------------------
+            // 1. SIMULACIÓN DE BASE DE DATOS CON LOCALSTORAGE
+            // Recuperar el array de objetos 'clasificaciones' desde localStorage. 
+            // Si no existe (es null), usamos un array vacío [] gracias al operador lógico ||
+            var clasificaciones= JSON.parse(localStorage.getItem("clasificaciones")) || [];
+
+            let tabla;
+            // 2. INSTANCIAS DE COMPONENTES BOOTSTRAP
+            // Inicializamos los modales de Bootstrap en variables para poder abrirlos (show) y cerrarlos (hide) desde JavaScript
+            const modalNClasificacion = new bootstrap.Modal(document.getElementById('modalNuevaClasificacion'));
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Llamada a la función que inyecta el menú (ubicada en js/funcionesSistema.js)
+                // Esto evita tener que copiar y pegar todo el HTML del menú en cada página.
+                cargarComponentes();
+                cargarTablaClasificaciones();
+
+                //Evento para Nueva Clasificación----------------------------------------------------------
+                // 3. CAPTURAR EL ENVÍO DEL FORMULARIO (SUBMIT)
+                document.getElementById('formNuevaClasificacion').addEventListener('submit', function (e) {
+                        // Usamos preventDefault() para evitar que la página se recargue (comportamiento por defecto de los formularios)
+                        e.preventDefault();
+
+                        const nuevaClasificacion = {
+                            idclasificacion: obtenerSiguienteId(clasificaciones),
+                            clasificacion: document.getElementById('clasificacion').value.trim().toUpperCase()
+                        };
+
+                        if (nuevaClasificacion.clasificacion === '') {
+                            alertify.error('Todos los campos son obligatorios');
+                            return;
+                        }
+
+                        if (clasificaciones.some(c => c.clasificacion === nuevaClasificacion.clasificacion)) {
+                            alertify.error('La clasificación ya existe');
+                            return;
+                        }
+
+                        clasificaciones.push(nuevaClasificacion);
+                        guardarClasificaciones(clasificaciones);
+                        this.reset();
+                        tabla.row.add(nuevaClasificacion).draw(false);
+                        modalNClasificacion.hide();
+                        alertify.success('Registro guardado');
+                });
+
+                
+                const modalEClasificacion = new bootstrap.Modal(document.getElementById('modalEditarClasificacion'));
+                // Evento para botón editar--------------------------------------------------------------
+                // 4. DELEGACIÓN DE EVENTOS (EVENT DELEGATION)
+                // Como los botones de "Editar" y "Eliminar" son creados dinámicamente por el DataTable, no podemos asignarles 
+                // un EventListener directo al cargar la página. Por eso, escuchamos los clics en TODO el 'document' y 
+                // verificamos si el elemento clickeado (e.target) corresponde a nuestro botón.
+                document.addEventListener('click', function (e) {
+                        if (e.target.closest('.btn-editar')) {
+                            const id = parseInt(e.target.closest('.btn-editar').dataset.id);
+                            const clasificacion = clasificaciones.find(c => c.idclasificacion === id);
+                            if (clasificacion) {
+                                document.getElementById('edit_idclasificacion').value = clasificacion.idclasificacion;
+                                document.getElementById('edit_clasificacion').value = clasificacion.clasificacion;
+                                modalEClasificacion.show();
+                            }
+                        }
+                });
+
+                // Guardar cambios al editar-----------------------------------------------------------
+                document.getElementById('formEditarClasificacion').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const id = parseInt(document.getElementById('edit_idclasificacion').value);
+                        const nuevaClasificacion = document.getElementById('edit_clasificacion').value.trim().toUpperCase();
+                        const index = clasificaciones.findIndex(c => c.idclasificacion === id);
+
+                        if (nuevaClasificacion === '') {
+                            alertify.error('El campo clasificación no puede estar vacío');
+                            return;
+                        }
+
+                        if (clasificaciones.some(c => c.clasificacion === nuevaClasificacion && c.idclasificacion !== id)) {
+                            alertify.error('Ya existe otra clasificación con ese nombre');
+                            return;
+                        }
+
+                        if (index !== -1) { //Si la clasificación existe dentro de la lista
+                            clasificaciones[index] = {
+                                idclasificacion: id,
+                                clasificacion: nuevaClasificacion
+                            };
+                            guardarClasificaciones(clasificaciones);
+                            tabla.clear().rows.add(clasificaciones).draw();
+                            modalEClasificacion.hide();
+                            alertify.success('Clasificación actualizada');
+                            //.clear(): Borra todo el contenido actual de la tabla
+                            //.rows.add(clasificaciones): Toma el nuevo array clasificaciones y lo carga en la tabla
+                            //.draw(): Renderiza los cambios. Sin esto, la tabla se quedaría en blanco o no mostraría los cambios
+                        }
+                });
+
+                const modalDelClasificacion = new bootstrap.Modal(document.getElementById('modalEliminarClasificacion'));
+
+                // Evento para botón eliminar (Abre el modal)
+                document.addEventListener('click', function (e) {
+                        if (e.target.closest('.btn-eliminar')) {
+                            const id = parseInt(e.target.closest('.btn-eliminar').dataset.id);
+                            const clasificacion = clasificaciones.find(c => c.idclasificacion === id);
+                            if (clasificacion) {
+                                document.getElementById('del_idclasificacion').value = id;
+                                document.getElementById('del_clasificacion').textContent = clasificacion.clasificacion;
+                                modalDelClasificacion.show();
+                            }
+                        }
+                });
+
+                // Evento para el botón eliminar dentro del modal (Ejecuta Alertify)
+                document.getElementById('btnConfirmarEliminar').addEventListener('click', function() {
+                        const id = parseInt(document.getElementById('del_idclasificacion').value);
+                        alertify.confirm("Eliminar clasificación", "¿Realmente deseas eliminar de forma permanente a esta clasificación?",
+                            function(){
+                                clasificaciones = clasificaciones.filter(c => c.idclasificacion !== id);
+                                guardarClasificaciones(clasificaciones);
+                                tabla.clear().rows.add(clasificaciones).draw();
+                                modalDelClasificacion.hide();
+                                alertify.success("Clasificación eliminada correctamente");
+                            },
+                            function(){
+                                modalDelClasificacion.hide();
+                                alertify.error("Eliminación cancelada");
+                            }
+                        ).set('labels', {ok:'Sí, eliminar', cancel:'No, mantener'});
+                });
+            });
+            //------------------------------------------------------------------------------
+            function cargarTablaClasificaciones(){
+                // Inicializar el DataTable
+                tabla = new DataTable("#tabla_clasificacion", {
+                        data: clasificaciones,
+                        columns: [
+                            { data: 'idclasificacion', title: 'IdClasificación' },
+                            { data: 'clasificacion', title: 'Clasificación' },
+                            
+                            {
+                                data: null,
+                                title: 'Acciones',
+                                orderable: false,
+                                searchable: false,
+                                width: '12%',
+                                render: function (data, type, row) {
+                                return `
+                                    <button class="btn btn-sm btn-warning me-1 btn-editar" 
+                                    data-id="${row.idclasificacion}"><i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger btn-eliminar" 
+                                    data-id="${row.idclasificacion}"><i class="bi bi-trash">
+                                    </i></button>
+                                `;
+                                }
+                            }
+                        ],
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'print',
+                                text: '<i class="bi bi-printer"></i> Imprimir',
+                                exportOptions: {
+                                    columns: [0, 1] // Solo imprime la columna 0 y 1    
+                                }
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="bi bi-filetype-xlsx"></i> Exportar a Excel',
+                                exportOptions: {
+                                    columns: [0, 1]
+                                }   
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                                exportOptions: {
+                                    columns: [0, 1] // Solo exporta la columna 0 y 1
+                                },
+                                title: '', // Dejamos el título por defecto vacío
+                                customize: function (doc) {
+                                    // 1. Obtener fecha y hora
+                                    const now = new Date();
+                                    const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                    const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                                    // 2. CREAR EL ENCABEZADO
+                                    doc.content.splice(0, 0, {
+                                        margin: [0, 0, 0, 12], 
+                                        table: {
+                                            widths: [100, '*', 'auto'], // 3 columnas para el encabezado (Izquierda, Centro, Derecha)
+                                            body: [
+                                                [
+                                                    // Columna Izquierda (Nombre de Empresa)
+                                                    { 
+                                                        text: 'PUNTO\nELEGANCIA', 
+                                                        fontSize: 14, 
+                                                        bold: true, 
+                                                        color: '#4e73df', 
+                                                        alignment: 'center' 
+                                                    },
+                                                    // Columna Central (Títulos y Ubicación)
+                                                    {
+                                                        stack: [
+                                                            { text: 'REPORTE DE CLASIFICACIONES', fontSize: 16, bold: true }, // <-- Cambia esto si es otra tabla
+                                                            { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
+                                                            { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                                        ],
+                                                        alignment: 'left',
+                                                        margin: [10, 0, 0, 0]
+                                                    },
+                                                    // Columna Derecha (Datos del documento)
+                                                    {
+                                                        stack: [
+                                                            { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                            { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                        ]
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        layout: 'noBorders' 
+                                    });
+
+                                    // 3. ESTILIZAR LA TABLA DE DATOS (Bordes suaves)
+                                    var objLayout = {};
+                                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['paddingLeft'] = function(i) { return 4; };
+                                    objLayout['paddingRight'] = function(i) { return 4; };
+                                    doc.content[1].layout = objLayout; 
+
+                                    // 4. AJUSTAR ANCHOS DE COLUMNAS (ADAPTADO A 2 COLUMNAS)
+                                    if (doc.content[1].table !== undefined) {
+                                        const tableNode = doc.content[1];
+                                        if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                            // 'auto' para el ID, '*' para que el nombre ocupe todo el resto de la hoja
+                                            tableNode.table.widths = ['auto', '*'];
+                                        }
+                                    }
+
+                                    // 5. PIE DE PÁGINA MEJORADO
+                                    doc.footer = function(currentPage, pageCount) {
+                                        return {
+                                            columns: [
+                                                {
+                                                    alignment: 'left',
+                                                    text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'),
+                                                    margin: [40, 10], 
+                                                    fontSize: 8
+                                                },
+                                                {
+                                                    alignment: 'right',
+                                                    text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(),
+                                                    margin: [40, 10],
+                                                    fontSize: 8
+                                                }
+                                            ]
+                                        };
+                                    };
+                                }
+                            },
+                            {
+                                text: '<i class="bi bi-file-earmark-plus"></i> Nueva clasificación',
+                                className: 'btn btn-sm btn-primary',
+                                action: function () {
+                                    document.getElementById('formNuevaClasificacion').reset();
+                                    modalNClasificacion.show();
+                                }
+                            }
+                        ],
+                        responsive: true,
+                        language: spanish,
+                        initComplete: function () {
+                            // Aplicar clases de Bootstrap a los botones
+                            $('.dt-button:contains("Nueva clasificación")')
+                                .removeClass('dt-button') // elimina estilo por defecto
+                                .addClass('btn btn-sm btn-primary'); // agrega estilos Bootstrap
+
+                            $('.dt-button:contains("Imprimir")')
+                                .removeClass('dt-button')
+                                .addClass('btn btn-sm btn-info');
+
+                            $('.dt-button:contains("Exportar a Excel")')
+                                .removeClass('dt-button')
+                                .addClass('btn btn-sm btn-success');
+
+                            $('.dt-button:contains("Exportar a PDF")')
+                                .removeClass('dt-button')
+                                .addClass('btn btn-sm btn-danger');
+                        }
+                });
+                //tabla.column(5).visible(false); //Ocultar la columna contraseña
+            }
+            //------------------------------------------------------------------------------
+            function guardarClasificaciones(data) {
+                localStorage.setItem('clasificaciones', JSON.stringify(data));
+            }
+            //------------------------------------------------------------------------------
+            function obtenerSiguienteId(clasificaciones) {
+                if (clasificaciones.length === 0){
+                        return 1;
+                }else{
+                        const maxId = Math.max(...clasificaciones.map(c => c.idclasificacion || 0));
+                        return maxId + 1;
+                }
+            }
+            //------------------------------------------------------------------------------
+            
+        </script>
+</body>
+</html>

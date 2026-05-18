@@ -56,7 +56,7 @@
                                                   <th>Celular</th>
                                                   <th>Usuario</th>
                                                   <th>Contraseña</th>
-                                                  <th>Rol</th>
+                                                  <th>Encargo</th>
                                                   <th>Acciones</th>
                                              </tr>
                                         </thead>
@@ -142,27 +142,36 @@
                     </div>
                     <div class="modal-body">
                          <input type="hidden" id="edit_idusuario">
+                         
                          <div class="mb-2">
                               <label class="form-label">N° Cédula</label>
                               <input type="number" id="edit_cedula" class="form-control" required min="1000000" max="9999999">
                          </div>
+                         
                          <div class="mb-2">
                               <label class="form-label">Nombre completo</label>
                               <input type="text" id="edit_nombre" class="form-control text-uppercase" required minlength="6" maxlength="50">
                          </div>
+                         
                          <div class="mb-2">
                               <label class="form-label">Celular</label>
                               <input type="text" id="edit_celular" class="form-control" required minlength="6" maxlength="12">
                          </div>
+                         
                          <div class="mb-2">
                               <label class="form-label">Usuario</label>
                               <input type="text" id="edit_usuario" class="form-control" required minlength="5" maxlength="30">
                          </div>
+                         
                          <div class="mb-2">
                               <label class="form-label">Contraseña</label>
-                              <input type="text" id="edit_contrasena" class="form-control" required minlength="5" maxlength="30">
+                              <input type="password" id="edit_contrasena" class="form-control" required minlength="5" maxlength="30">
                          </div>
                          
+                         <div class="mb-2">
+                              <label class="form-label">Confirmar Contraseña</label>
+                              <input type="password" id="edit_contrasena_conf" class="form-control" required>
+                         </div>
                     </div>
                     <div class="modal-footer">
                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
@@ -170,7 +179,7 @@
                     </div>
                </form>
           </div>
-     </div>
+          </div>
      <!-- Modal Eliminar Usuario -->
      <div class="modal fade" id="modalEliminarUsuario" tabindex="-1" aria-labelledby="modalEliminarUsuarioLabel" aria-hidden="true" data-bs-backdrop="static">
           <div class="modal-dialog">
@@ -246,49 +255,79 @@
 
                     //Evento para Nuevo Usuario----------------------------------------------------------
                     // 3. CAPTURAR EL ENVÍO DEL FORMULARIO (SUBMIT)
-                    document.getElementById('formNuevoUsuario').addEventListener('submit', function (e) {
+                         document.getElementById('formNuevoUsuario').addEventListener('submit', function (e) {
                          // Usamos preventDefault() para evitar que la página se recargue (comportamiento por defecto de los formularios)
                          e.preventDefault();
 
+                         // Extraemos los valores de los inputs
+                         const cedulaInput = document.getElementById('cedula').value.trim();
+                         const usuarioInput = document.getElementById('txtusuario').value.trim();
                          const pass = document.getElementById('contrasena').value;
                          const confirmPass = document.getElementById('confirmar_contrasena').value;
                          const rolSeleccionado = document.getElementById('selRol').value;
 
-                         if(pass !== confirmPass){
-                              alertify.error("Las Contraseñsa no coinciden");
+                         // ====================================================================
+                         // 1. VALIDACIÓN: NO PERMITIR CÉDULA DUPLICADA
+                         // ====================================================================
+                         const existeCedula = usuarios.some(u => u.cedula === cedulaInput);
+                         if (existeCedula) {
+                              alertify.error("Ya existe un usuario registrado con este número de cédula.");
+                              document.getElementById('cedula').focus(); // Pone el cursor en la cédula
+                              return; // Corta la ejecución aquí
+                         }
+
+                         // ====================================================================
+                         // 2. VALIDACIÓN: NO PERMITIR USUARIO DUPLICADO
+                         // ====================================================================
+                         const existeUsuario = usuarios.some(u => u.usuario.toLowerCase() === usuarioInput.toLowerCase());
+                         if (existeUsuario) {
+                              alertify.error("El nombre de usuario ya está en uso. Por favor, elige otro.");
+                              document.getElementById('txtusuario').focus();
                               return;
                          }
 
-                         const regexSegura = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-                         if (!regexSegura.test(pass)) {
-                         alertify.warning("La contraseña debe tener al menos 8 caracteres, incluyendo letras y números");
-                         return;
+                         // 3. Validar coincidencia de contraseñas
+                         if (pass !== confirmPass) {
+                              alertify.error("Las Contraseñas no coinciden");
+                              return;
                          }
 
+                         // 4. Validar contraseña segura
+                         const regexSegura = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+                         if (!regexSegura.test(pass)) {
+                              alertify.warning("La contraseña debe tener al menos 8 caracteres, incluyendo letras y números");
+                              return;
+                         }
+
+                         // 5. Construir el nuevo objeto
                          const nuevoUsuario = {
                               idusuario: obtenerSiguienteId(usuarios),
-                              cedula: document.getElementById('cedula').value.trim(),
+                              cedula: cedulaInput, // Usamos la variable que ya limpiamos con trim()
                               nombre: document.getElementById('nombre').value.trim().toUpperCase(),
                               celular: document.getElementById('celular').value.trim(),
-                              usuario: document.getElementById('txtusuario').value.trim(),
+                              usuario: usuarioInput, // Usamos la variable que ya limpiamos con trim()
                               contrasena: pass,
                               rol: rolSeleccionado
                          };
 
+                         // 6. Validar campos vacíos por si acaso
                          if (Object.values(nuevoUsuario).some(val => val === '')) {
                               alert('Todos los campos son obligatorios');
                               return;
                          }
 
+                         // 7. Guardar y refrescar
                          usuarios.push(nuevoUsuario);
                          guardarUsuarios(usuarios);
+                         
+                         // Actualizar la tabla de DataTables
                          tabla.clear().rows.add(usuarios).draw();
                          tabla.column(5).visible(false);
+                         
                          this.reset();
-                         //tabla.row.add(nuevoUsuario).draw();
-                         modalNUsuario.hide();
-                         alertify.success("Registro guardado");
-                    });
+                         modalNUsuario.hide(); // Cerrar modal según tu variable global
+                         alertify.success("Registro guardado exitosamente");
+                         });
 
                  
                     const modalEUsuario = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
@@ -298,78 +337,98 @@
                     // un EventListener directo al cargar la página. Por eso, escuchamos los clics en TODO el 'document' y 
                     // verificamos si el elemento clickeado (e.target) corresponde a nuestro botón.
                     document.addEventListener('click', function (e) {
-                         if (e.target.closest('.btn-editar')) {
-                              const id = parseInt(e.target.closest('.btn-editar').dataset.id);
-                              const usuario = usuarios.find(u => u.idusuario === id);
+                    if (e.target.closest('.btn-editar')) {
+                         const id = parseInt(e.target.closest('.btn-editar').dataset.id);
+                         
+                         // Obtener la lista actualizada desde el almacenamiento local
+                         const usuariosData = JSON.parse(localStorage.getItem('usuarios')) || [];
+                         const usuario = usuariosData.find(u => u.idusuario === id);
+                         
+                         if (usuario) {
+                              const rolActual = localStorage.getItem("rolUsuario");
+
+                              // 1. Cargar la información base en los controles del modal
+                              document.getElementById('edit_idusuario').value = usuario.idusuario;
+                              document.getElementById('edit_cedula').value = usuario.cedula;
+                              document.getElementById('edit_nombre').value = usuario.nombre;
+                              document.getElementById('edit_celular').value = usuario.celular;
+                              document.getElementById('edit_usuario').value = usuario.usuario;
                               
-                              if (usuario) {
-                                   // 1. Obtener el rol del usuario que inició sesión
-                                   const rolActual = localStorage.getItem("rolUsuario");
+                              // Sincronizar contraseñas por defecto
+                              document.getElementById('edit_contrasena').value = usuario.contrasena;
+                              document.getElementById('edit_contrasena_conf').value = usuario.contrasena;
 
-                                   // 2. Cargar los datos en el modal
-                                   document.getElementById('edit_idusuario').value = usuario.idusuario;
-                                   document.getElementById('edit_cedula').value = usuario.cedula;
-                                   document.getElementById('edit_nombre').value = usuario.nombre;
-                                   document.getElementById('edit_celular').value = usuario.celular;
-                                   document.getElementById('edit_usuario').value = usuario.usuario;
-                                   document.getElementById('edit_contrasena').value = usuario.contrasena;
+                              // 2. APLICACIÓN DE RESTRICCIONES SEGÚN ROL ACTIVO
+                              if (rolActual === "Administrador") {
+                                   // ADMIN: Modifica cédula, nombre, celular. No puede tocar credenciales (Usuario/Clave)
+                                   document.getElementById('edit_cedula').readOnly = false;
+                                   document.getElementById('edit_nombre').readOnly = false;
+                                   document.getElementById('edit_celular').readOnly = false;
                                    
-                                   // Si tienes un campo para el rol en tu modal, lo cargamos
-                                   const campoRol = document.getElementById('edit_rol');
-                                   if(campoRol) campoRol.value = usuario.rol;
-
-                                   // 3. APLICAR RESTRICCIONES DE SEGURIDAD
-                                   if (rolActual !== "Administrador") {
-                                        // Bloquear campos para que el usuario normal solo los vea, pero no los edite
-                                        document.getElementById('edit_cedula').readOnly = true;
-                                        document.getElementById('edit_nombre').readOnly = true;
-                                        document.getElementById('edit_celular').readOnly = true;
-                                        
-                                        // Los <select> se bloquean con disabled, no con readOnly
-                                        if(campoRol) campoRol.disabled = true; 
-                                        
-                                        // Garantizar que usuario y contraseña estén desbloqueados
-                                        document.getElementById('edit_usuario').readOnly = false;
-                                        document.getElementById('edit_contrasena').readOnly = false;
-                                   } else {
-                                        // Si es Administrador, asegurarse de que todo esté desbloqueado 
-                                        // (por si acaso el modal se quedó bloqueado de una edición anterior)
-                                        document.getElementById('edit_cedula').readOnly = false;
-                                        document.getElementById('edit_nombre').readOnly = false;
-                                        document.getElementById('edit_celular').readOnly = false;
-                                        if(campoRol) campoRol.disabled = false;
-                                        
-                                        document.getElementById('edit_usuario').readOnly = false;
-                                        document.getElementById('edit_contrasena').readOnly = false;
-                                   }
-
-                                   // 4. Mostrar el modal
-                                   modalEUsuario.show();
+                                   document.getElementById('edit_usuario').readOnly = true;
+                                   document.getElementById('edit_contrasena').readOnly = true;
+                                   document.getElementById('edit_contrasena_conf').readOnly = true;
+                              } else {
+                                   // NO ADMIN: Únicamente puede editar su propio Usuario y Contraseña.
+                                   document.getElementById('edit_cedula').readOnly = true;
+                                   document.getElementById('edit_nombre').readOnly = true;
+                                   document.getElementById('edit_celular').readOnly = true;
+                                   
+                                   document.getElementById('edit_usuario').readOnly = false;
+                                   document.getElementById('edit_contrasena').readOnly = false;
+                                   document.getElementById('edit_contrasena_conf').readOnly = false;
                               }
-                         }
-                         });
 
-                    // Guardar cambios al editar-----------------------------------------------------------
-                     document.getElementById('formEditarUsuario').addEventListener('submit', function (e) {
+                              // 3. Desplegar el modal usando la API de Bootstrap 5
+                              var miModal = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
+                              miModal.show();
+                         }
+                    }
+                    });
+
+                     // Guardar cambios al editar-----------------------------------------------------------
+                    document.getElementById('formEditarUsuario').addEventListener('submit', function (e) {
                     e.preventDefault();
                     
                     const id = parseInt(document.getElementById('edit_idusuario').value);
                     const index = usuarios.findIndex(u => u.idusuario === id);
                     
                     if (index !== -1) {
-                         // --- IMPORTANTE: Capturamos el login que tenía el usuario antes de editarlo ---
-                         const usuarioViejo = usuarios[index].usuario; 
-                         const loginSesionActual = localStorage.getItem("userLogin");
-                         
                          // Capturamos los nuevos valores del formulario
+                         const cedulaInput = document.getElementById('edit_cedula').value.trim();
                          const nuevoNombre = document.getElementById('edit_nombre').value.trim().toUpperCase();
                          const nuevoLogin = document.getElementById('edit_usuario').value.trim();
                          const nuevaContrasena = document.getElementById('edit_contrasena').value.trim();
 
+                         // ====================================================================
+                         // RESTRICCIÓN: VALIDAR CÉDULA DUPLICADA EN EDICIÓN
+                         // ====================================================================
+                         // Buscamos si "u.cedula" es igual a la ingresada, pero que pertenezca a OTRO "idusuario"
+                         const existeCedulaDuplicada = usuarios.some(u => u.cedula === cedulaInput && u.idusuario !== id);
+                         if (existeCedulaDuplicada) {
+                              alertify.error("Error: El número de cédula ya está asignado a otro usuario.");
+                              document.getElementById('edit_cedula').focus(); // Pone el cursor en el campo
+                              return; // Detiene por completo el proceso de guardado
+                         }
+
+                         // ====================================================================
+                         // RESTRICCIÓN: VALIDAR NOMBRE DE USUARIO DUPLICADO EN EDICIÓN
+                         // ====================================================================
+                         const existeUsuarioDuplicado = usuarios.some(u => u.usuario.toLowerCase() === nuevoLogin.toLowerCase() && u.idusuario !== id);
+                         if (existeUsuarioDuplicado) {
+                              alertify.error("Error: El nombre de usuario ya está asignado a otra persona.");
+                              document.getElementById('edit_usuario').focus();
+                              return;
+                         }
+
+                         // --- IMPORTANTE: Capturamos el login que tenía el usuario antes de editarlo ---
+                         const usuarioViejo = usuarios[index].usuario; 
+                         const loginSesionActual = localStorage.getItem("userLogin");
+
                          // Actualizamos el objeto en el array (incluyendo el ROL que ya tenía)
                          usuarios[index] = {
                               ...usuarios[index], // Mantiene campos que no están en el form como el 'rol'
-                              cedula: document.getElementById('edit_cedula').value.trim(),
+                              cedula: cedulaInput,
                               nombre: nuevoNombre,
                               celular: document.getElementById('edit_celular').value.trim(),
                               usuario: nuevoLogin,
@@ -445,124 +504,174 @@
                     });
                });
                //------------------------------------------------------------------------------
-               function cargarTablaUsuarios(){
-                    //Necesarios para filtrar
-                    const rolActual = localStorage.getItem("rolUsuario");
-                    const loginActual = localStorage.getItem("userLogin");
-                    const usuariosData = JSON.parse(localStorage.getItem('usuarios')) || [];
+               function cargarTablaUsuarios() {
+               // 1. Obtener datos actualizados del localStorage
+               const rolActual = localStorage.getItem("rolUsuario"); 
+               const loginActual = localStorage.getItem("userLogin");
+               const usuariosData = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-                    // 1. Si no es Admin, filtramos para que solo vea SU PROPIO registro
-                    let datosFiltrados = usuariosData;
-                    if (rolActual !== "Administrador") {
-                         datosFiltrados = usuariosData.filter(u => u.usuario === loginActual);
-                         // Ocultamos el botón "Nuevo usuario"
-                         $('#btnNuevoUsuario').hide(); 
-                    }
-                    // Inicializar el DataTable
-                    tabla = new DataTable("#tabla_usuarios", {
-                         data: usuarios,
-                         columns: [
-                              { data: 'idusuario', title: 'Id Usuario' },
-                              { data: 'cedula', title: 'N° Cédula' },
-                              { data: 'nombre', title: 'Nombre' },
-                              { data: 'celular', title: 'Celular' },
-                              { data: 'usuario', title: 'Usuario' },
-                              { data: 'contrasena', title: 'Contraseña' },
-                              {data: 'rol', title: 'Rol'},
-                              {
-                                   data: null,
-                                   render: function (data, type, row) {
-                                   return `
-                                        <button class="btn btn-sm btn-warning me-1 btn-editar" data-id="${row.idusuario}"><i class="bi bi-pencil-square"></i></button>
-                                        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.idusuario}"><i class="bi bi-trash"></i></button>
-                                   `;
-                                   }
-                              }
-                         ],
-                         dom: 'Bfrtip',
-                         buttons: [
-                              {
-                                   extend: 'excelHtml5',
-                                   text: '<i class="bi bi-filetype-xlsx"></i> Exportar a Excel',
-                                    title: 'PUNTO ELEGANCIA - REPORTE USUARIOS',
-                                   filename: 'Punto_Elegancia_Articulos',
-                                   exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6] }
+               // 2. Filtrar si no es Admin para que solo vea SU PROPIO registro
+               let datosFiltrados = usuariosData;
+               if (rolActual !== "Administrador") {
+                    datosFiltrados = usuariosData.filter(u => u.usuario === loginActual);
+               }
 
-                              },
-                              {
-                                   extend: 'pdfHtml5',
-                                   text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
-                                   orientation: 'landscape',
-                                   pageSize:'A4',
-                                   title: '', //aqui ira el membrete
-                                   exportOptions: {
-                                        columns: [0, 1, 2, 3, 4, 6] // Excluye columna de acciones (índice 6)
-                                   },
-                                   customize: function (doc) {
-                                   // --- MEMBRETE Y LOGO ---
-                                   // doc.content[0] es el título, lo reemplazamos por un diseño profesional
-                                   doc.content.splice(0, 0, {
-                                        margin: [0, 0, 0, 12],
+               // 3. Configurar los botones de exportación dinámicamente
+               let botonesExportacion = [
+                    {
+                         extend: 'excelHtml5',
+                         text: '<i class="bi bi-filetype-xlsx"></i> Exportar a Excel',
+                         title: 'PUNTO ELEGANCIA - REPORTE USUARIOS',
+                         filename: 'Punto_Elegancia_Usuarios',
+                         exportOptions: { columns: [0, 1, 2, 3, 4, 6] }
+                    },
+                    {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                                filename: 'Reporte_de_Usuarios', 
+                                exportOptions: {
+                                    // Exporta las 6 columnas de datos visibles, dejando fuera la columna de Acciones
+                                    columns: [0, 1, 2, 3, 4, 6] 
+                                },
+                                title: '', 
+                                customize: function (doc) {
+                                    const now = new Date();
+                                    const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                    const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                                    // ENCABEZADO CORPORATIVO
+                                    doc.content.splice(0, 0, {
+                                        margin: [0, 0, 0, 12], 
                                         table: {
-                                        widths: [80, '*', 'auto'],
-                                        body: [
-                                             [
-                                                  // Aquí iría tu logo en Base64 (puedes dejarlo vacío o poner texto)
-                                                  { text: 'PUNTO\nELEGANCIA', fontSize: 14, bold: true, color: '#4e73df', alignment: 'center' },
-                                                  {
-                                                       stack: [
+                                            widths: [100, '*', 'auto'], 
+                                            body: [
+                                                [
+                                                    { 
+                                                        text: 'PUNTO\nELEGANCIA', 
+                                                        fontSize: 14, 
+                                                        bold: true, 
+                                                        color: '#4e73df', 
+                                                        alignment: 'center' 
+                                                    },
+                                                    {
+                                                        stack: [
                                                             { text: 'REPORTE DE USUARIOS', fontSize: 16, bold: true },
-                                                            { text: 'Venta de Ropa y Accesorios', fontSize: 10, color: '#666' },
+                                                            { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
                                                             { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
-                                                       ],
-                                                       alignment: 'left',
-                                                       margin: [10, 0, 0, 0]
-                                                  },
-                                                  {
-                                                       stack: [
-                                                            { text: 'INFORME DE ARTÍCULOS', fontSize: 12, bold: true, alignment: 'right' },
-                                                            { text: 'Fecha: ' + new Date().toLocaleDateString(), fontSize: 10, alignment: 'right' },
-                                                            { text: 'Hora: ' + new Date().toLocaleTimeString(), fontSize: 10, alignment: 'right' }
-                                                       ]
-                                                  }
-                                             ]
-                                        ]
+                                                        ],
+                                                        alignment: 'left',
+                                                        margin: [10, 0, 0, 0]
+                                                    },
+                                                    {
+                                                        stack: [
+                                                            { text: 'INFORME DE USUARIOS', fontSize: 12, bold: true, alignment: 'right' },
+                                                            { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                            { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                        ]
+                                                    }
+                                                ]
+                                            ]
                                         },
-                                        layout: 'noBorders'
-                                   });
-                                   }
-                               }, //Fin de pdf
-                              {
-                                   text: '<i class="bi bi-file-earmark-plus"></i> Nuevo usuario',
-                                   className: 'btn btn-sm btn-primary',
-                                   action: function (e, dt, node, config) {
-                                        // Abrir un modal para crear un nuevo usuario
-                                        $('#modalNuevoUsuario').modal('show');
-                                   }
-                              }
-                         ],
-                         responsive: true,
-                         language: spanish,
-                         initComplete: function () {
-                              // Aplicar clases de Bootstrap a los botones
-                              $('.dt-button:contains("Nuevo usuario")')
-                                   .removeClass('dt-button') // elimina estilo por defecto
-                                   .addClass('btn btn-sm btn-primary'); // agrega estilos Bootstrap
+                                        layout: 'noBorders' 
+                                    });
 
-                              $('.dt-button:contains("Imprimir")')
-                                   .removeClass('dt-button')
-                                   .addClass('btn btn-sm btn-info');
+                                    // ESTILIZAR BORDES
+                                    var objLayout = {};
+                                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['paddingLeft'] = function(i) { return 4; };
+                                    objLayout['paddingRight'] = function(i) { return 4; };
+                                    doc.content[1].layout = objLayout; 
 
-                              $('.dt-button:contains("Exportar a Excel")')
-                                   .removeClass('dt-button')
-                                   .addClass('btn btn-sm btn-success');
+                                    // ASIGNAR 6 ANCHOS EXACTOS
+                                    if (doc.content[1].table !== undefined) {
+                                        const tableNode = doc.content[1];
+                                        if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                            // 6 anchos correspondientes a tus 6 columnas exportadas.
+                                            // El '*' expande la columna 'Nombre' para que sea la más cómoda de leer.
+                                            tableNode.table.widths = ['auto', 'auto', '*', 'auto', 'auto', 'auto'];
+                                        }
+                                    }
 
-                              $('.dt-button:contains("Exportar a PDF")')
-                                   .removeClass('dt-button')
-                                   .addClass('btn btn-sm btn-danger');
+                                    // PIE DE PÁGINA
+                                    doc.footer = function(currentPage, pageCount) {
+                                        return {
+                                            columns: [
+                                                {
+                                                    alignment: 'left',
+                                                    text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'),
+                                                    margin: [40, 10], 
+                                                    fontSize: 8
+                                                },
+                                                {
+                                                    alignment: 'right',
+                                                    text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(),
+                                                    margin: [40, 10],
+                                                    fontSize: 8
+                                                }
+                                            ]
+                                        };
+                                    };
+                                }
+                            },
+               ];
+
+               // Solo agregar el botón "Nuevo usuario" si es Administrador
+               if (rolActual === "Administrador") {
+                    botonesExportacion.push({
+                         text: '<i class="bi bi-file-earmark-plus"></i> Nuevo usuario',
+                         className: 'btn-nuevo-dt',
+                         action: function (e, dt, node, config) {
+                              $('#modalNuevoUsuario').modal('show');
                          }
                     });
-                    tabla.column(5).visible(false); //Ocultar la columna contraseña
+               }
+
+               // 4. DESTRUCCIÓN SEGURA: Si la tabla ya existe, la destruimos PERO NO SE HACE .empty()
+               if ($.fn.DataTable.isDataTable('#tabla_usuarios')) {
+                    $('#tabla_usuarios').DataTable().destroy();
+               }
+
+               // 5. Inicializar el DataTable con los DATOS FILTRADOS
+               tabla = new DataTable("#tabla_usuarios", {
+                    data: datosFiltrados, // <-- CORREGIDO: Usamos la variable con datos reales y filtrados
+                    columns: [
+                         { data: 'idusuario', title: 'Id Usuario' },
+                         { data: 'cedula', title: 'N° Cédula' },
+                         { data: 'nombre', title: 'Nombre' },
+                         { data: 'celular', title: 'Celular' },
+                         { data: 'usuario', title: 'Usuario' },
+                         { data: 'contrasena', title: 'Contraseña' },
+                         { data: 'rol', title: 'Encargo' },
+                         {
+                              data: null,
+                              render: function (data, type, row) {
+                                   let botones = `<button class="btn btn-sm btn-warning me-1 btn-editar" data-id="${row.idusuario}"><i class="bi bi-pencil-square"></i></button>`;
+                                   
+                                   // REGLA: Es Admin + No es él mismo + EL OTRO USUARIO NO ES ADMIN
+                                   if (rolActual === "Administrador" && row.usuario !== loginActual && row.rol !== "Administrador") {
+                                   botones += `<button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.idusuario}"><i class="bi bi-trash"></i></button>`;
+                                   }
+                                   
+                                   return botones;
+                              }
+                         }
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: botonesExportacion,
+                    responsive: true,
+                    language: spanish, // Reutiliza tu variable de idioma español
+                    initComplete: function () {
+                         // Estilizar botones con Bootstrap
+                         $('.dt-button.buttons-excel').removeClass('dt-button').addClass('btn btn-sm btn-success');
+                         $('.dt-button.buttons-pdf').removeClass('dt-button').addClass('btn btn-sm btn-danger');
+                         $('.btn-nuevo-dt').removeClass('dt-button').addClass('btn btn-sm btn-primary');
+                    }
+               });
+
+               tabla.column(5).visible(false); // Ocultar columna contraseña
                }
                //------------------------------------------------------------------------------
                function guardarUsuarios(data) {

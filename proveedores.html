@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <title>Proveedores</title>
+        <link rel="icon" type="image/png" href="img/working.png">
+        
+        <!-- ESTILOS DEL MENU -->
+        <link href="menu/styles.css" rel="stylesheet" />
+    
+        <!-- BOOTSTRAP ICONS -->
+        <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+        <!-- DATATABLES -->
+        <link rel="stylesheet" href="dt/datatables.min.css">
+        <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+        <!-- ALERTIFYJS -->
+        <link rel="stylesheet" href="alert/alertify.min.css">
+        <link rel="stylesheet" href="alert/themes/default.min.css">
+        <script src="alert/alertify.min.js"></script>
+        
+    </head>
+    <body class="sb-nav-fixed">
+        <!-- ======================================================== -->
+        <!-- 1. CONTENEDOR DINÁMICO PARA LA BARRA SUPERIOR (NAVBAR)   -->
+        <!-- Este div vacío será llenado por JavaScript usando fetch()-->
+        <!-- con el contenido del archivo 'navbar.html'.              -->
+        <!-- ======================================================== -->
+        <div id="contenedor-navbar"></div>
+        <div id="layoutSidenav">
+            <!-- ======================================================== -->
+            <!-- 2. CONTENEDOR DINÁMICO PARA EL MENÚ LATERAL (SIDEBAR)    -->
+            <!-- Este div vacío será llenado por JavaScript usando fetch()-->
+            <!-- con el contenido del archivo 'sidebar.html'.             -->
+            <!-- ======================================================== -->
+            <div id="contenedor-sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                        <!-- AQUÍ VA TODO LO QUE SE VA A VISUALIZAR EN LA PÁGINA -->
+                        <!-- CUERPO DEL DASHBOARD -->
+                <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-2">Proveedores</h1>
+                            <div class="row">
+                                <table id="tabla_proveedores" class="display compact" style="width:100%">
+                                    <thead>
+                                            <tr>
+                                                <th>Id Proveedor</th>
+                                                <th>Nº RUC</th>
+                                                <th>Razon Social</th>
+                                                <th>Dirección</th>
+                                                <th>Telefono</th>
+                                                <th>Ciudad</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                    </thead>
+
+                                </table>
+
+                            </div>
+                        </div>
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                        <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Your Website 2026</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                        </div>
+                </footer>
+            </div>
+        </div>
+    
+    <!-- Modal Nuevo Proveedor -->
+    <div class="modal fade" id="modalNuevoProveedor" tabindex="-1" aria-labelledby="modalProveedorLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <form id="formNuevoProveedor" class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalProveedorLabel"><i class="bi bi-person-plus-fill"></i> Agregar Nuevo Proveedor</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="mb-2">
+                            <label class="form-label">N° RUC</label>
+                            <input type="text" id="ruc" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Razon Social</label>
+                            <input type="text" id="razon_social" class="form-control" required minlength="6" maxlength="12">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" id="direccion" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" id="telefono" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Ciudad</label>
+                            <input type="text" id="ciudad" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Guardar Proveedor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Proveedor -->
+    <div class="modal fade" id="modalEditarProveedor" tabindex="-1"
+    aria-labelledby="modalEditarProveedorLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <form id="formEditarProveedor" class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="modalEditarProveedorLabel"><i class="bi bi-pencil-square"></i> Editar Proveedor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                        <input type="hidden" id="edit_idproveedor">
+                        <div class="mb-2">
+                            <label class="form-label">N° RUC</label>
+                            <input type="text" id="edit_ruc" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Razon Social</label>
+                            <input type="text" id="edit_razon_social" class="form-control" required minlength="6" maxlength="12">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" id="edit_direccion" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" id="edit_telefono" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Ciudad</label>
+                            <input type="text" id="edit_ciudad" class="form-control" required minlength="5" maxlength="30">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-warning"><i class="bi bi-floppy"></i> Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Eliminar Proveedor -->
+    <div class="modal fade" id="modalEliminarProveedor" tabindex="-1"
+    aria-labelledby="modalEliminarProveedorLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="modalEliminarProveedorLabel"><i class="bi bi-exclamation-triangle-fill"></i> Eliminar Proveedor</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                        <p class="text-center fw-bold">¿Deseas proceder con la eliminación?</p>
+                        <input type="hidden" id="del_idproveedor">
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item"><strong>RUC:</strong> <span id="del_ruc"></span></li>
+                            <li class="list-group-item"><strong>Razon Social:</strong> <span id="del_razon_social"></span></li>
+                            <li class="list-group-item"><strong>Dirección:</strong> <span id="del_direccion"></span></li>
+                            <li class="list-group-item"><strong>Teléfono:</strong> <span id="del_telefono"></span></li>
+                            <li class="list-group-item"><strong>Ciudad:</strong> <span id="del_ciudad"></span></li>
+                        </ul>
+                </div>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmarEliminar"><i class="bi bi-trash"></i> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script src="js/seguridad.js"></script>
+        <script src="js/funcionesSistema.js"></script>
+        <!-- MENU -->
+        <script src="menu/bootstrap.bundle.min.js"></script>
+        <script src="menu/scripts.js"></script>
+        <!-- DATATABLES -->
+        <script src="dt/jquery-3.7.1.js"></script>
+        <script src="dt/datatables.min.js"></script>
+        <script src="dt/jquery.dataTables.min.js"></script>
+        <!-- DATATABLES Buttons extension -->
+        <script src="dt/dataTables.buttons.min.js"></script>
+        <script src="dt/buttons.print.min.js"></script>
+        <script src="dt/buttons.html5.min.js"></script>
+        <!-- DATATABLES JSZip y pdfmake para exportar -->
+        <script src="dt/jszip.min.js"></script>
+        <script src="dt/pdfmake.min.js"></script>
+        <script src="dt/vfs_fonts.js"></script>
+        <!-- DATATABLES Idioma Español -->
+        <script src="dt/es-ES.js"></script>
+
+        <script>
+            //Al cargarse la página---------------------------------------------------------------------------
+            //Control de seguridad en la apertura de la página------------------------------------------------
+            var nom = localStorage.getItem("nomUsuario");
+            if (nom == "" || nom == null){
+                window.location.href = "error.html"; // Redirige al login
+            }
+            //Fin del Control de seguridad en la apertura de la página----------------------------------------
+            
+            //------------------------------------------------------------------------------------------------
+            // 1. SIMULACIÓN DE BASE DE DATOS CON LOCALSTORAGE
+            // Recuperar el array de objetos 'proveedores' desde localStorage. 
+            // Si no existe (es null), usamos un array vacío [] gracias al operador lógico ||
+            var proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
+
+            let tabla;
+            // 2. INSTANCIAS DE COMPONENTES BOOTSTRAP
+            // Inicializamos los modales de Bootstrap en variables para poder abrirlos (show) y cerrarlos (hide) desde JavaScript
+            const modalNProveedor = new bootstrap.Modal(document.getElementById('modalNuevoProveedor'));
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Llamada a la función que inyecta el menú (ubicada en js/funcionesSistema.js)
+                // Esto evita tener que copiar y pegar todo el HTML del menú en cada página.
+                cargarComponentes();
+                cargarTablaProveedores();
+
+                //Evento para Nuevo Proveedor----------------------------------------------------------
+                // 3. CAPTURAR EL ENVÍO DEL FORMULARIO (SUBMIT)
+                document.getElementById('formNuevoProveedor').addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const rucInput = document.getElementById('ruc').value.trim();
+                    const razonSocialInput = document.getElementById('razon_social').value.trim().toUpperCase();
+                    const direccionInput = document.getElementById('direccion').value.trim().toUpperCase();
+                    const telefonoInput = document.getElementById('telefono').value.trim();
+                    const ciudadInput = document.getElementById('ciudad').value.trim().toUpperCase();
+
+                    // VALIDACIÓN ESTRICTA: Evitar RUC duplicado
+                    const existeRuc = proveedores.some(p => p.ruc === rucInput);
+                    if (existeRuc) {
+                        alertify.error('Error: Ya existe un proveedor registrado con este R.U.C.');
+                        document.getElementById('ruc').focus();
+                        return;
+                    }
+
+                    // Creamos el objeto normalizando la propiedad a "razonsocial"
+                    const nuevoProveedor = {
+                        idproveedor: obtenerSiguienteId(proveedores),
+                        ruc: rucInput,
+                        razonsocial: razonSocialInput, 
+                        direccion: direccionInput,
+                        telefono: telefonoInput,
+                        ciudad: ciudadInput
+                    };
+
+                    proveedores.push(nuevoProveedor);
+                    guardarProveedores(proveedores);
+                    
+                    this.reset();
+                    tabla.clear().rows.add(proveedores).draw();
+                    modalNProveedor.hide();
+                    alertify.success("Proveedor registrado con éxito");
+                });
+
+                
+                const modalEProveedor = new bootstrap.Modal(document.getElementById('modalEditarProveedor'));
+                // Evento para botón editar--------------------------------------------------------------
+                // 4. DELEGACIÓN DE EVENTOS (EVENT DELEGATION)
+                // Como los botones de "Editar" y "Eliminar" son creados dinámicamente por el DataTable, no podemos asignarles 
+                // un EventListener directo al cargar la página. Por eso, escuchamos los clics en TODO el 'document' y 
+                // verificamos si el elemento clickeado (e.target) corresponde a nuestro botón.
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.btn-editar')) {
+                        const id = parseInt(e.target.closest('.btn-editar').dataset.id);
+                        const proveedor = proveedores.find(p => p.idproveedor === id);
+                        if (proveedor) {
+                            document.getElementById('edit_idproveedor').value = proveedor.idproveedor;
+                            document.getElementById('edit_ruc').value = proveedor.ruc;
+                            document.getElementById('edit_razon_social').value = proveedor.razonsocial || proveedor.tabla_proveedores || proveedor.nombre || "";
+                            document.getElementById('edit_direccion').value = proveedor.direccion;
+                            document.getElementById('edit_telefono').value = proveedor.telefono;
+                            document.getElementById('edit_ciudad').value = proveedor.ciudad;
+                            modalEProveedor.show();
+                        }
+                    }
+                });
+
+                // Guardar cambios al editar-----------------------------------------------------------
+                document.getElementById('formEditarProveedor').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const id = parseInt(document.getElementById('edit_idproveedor').value);
+                    const rucInput = document.getElementById('edit_ruc').value.trim();
+                    const index = proveedores.findIndex(p => p.idproveedor === id);
+
+                    // VALIDACIÓN: Evitar RUC duplicado excluyendo el actual
+                    const existeRucDuplicado = proveedores.some(p => p.ruc === rucInput && p.idproveedor !== id);
+                    if (existeRucDuplicado) {
+                        alertify.error('Error: El R.U.C. ingresado ya pertenece a otro proveedor.');
+                        document.getElementById('edit_ruc').focus();
+                        return;
+                    }
+
+                    if (index !== -1) { 
+                        proveedores[index].ruc = rucInput;
+                        proveedores[index].razonsocial = document.getElementById('edit_razon_social').value.trim().toUpperCase();
+                        
+                        // Limpiamos la basura vieja si existía para mantener la base de datos limpia
+                        delete proveedores[index].tabla_proveedores;
+                        delete proveedores[index].nombre;
+
+                        proveedores[index].direccion = document.getElementById('edit_direccion').value.trim().toUpperCase();
+                        proveedores[index].telefono = document.getElementById('edit_telefono').value.trim();
+                        proveedores[index].ciudad = document.getElementById('edit_ciudad').value.trim().toUpperCase();
+                        
+                        guardarProveedores(proveedores);
+                        tabla.clear().rows.add(proveedores).draw();
+                        modalEProveedor.hide();
+                        alertify.success("Proveedor actualizado correctamente");
+                    }
+                });
+
+                const modalDelProveedor = new bootstrap.Modal(document.getElementById('modalEliminarProveedor'));
+
+                // Evento para botón eliminar (Abre el modal)
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.btn-eliminar')) {
+                        const id = parseInt(e.target.closest('.btn-eliminar').dataset.id);
+                        const proveedor = proveedores.find(p => p.idproveedor === id);
+                        if (proveedor) {
+                            document.getElementById('del_idproveedor').value = proveedor.idproveedor;
+                            document.getElementById('del_ruc').textContent = proveedor.ruc;
+                            document.getElementById('del_razon_social').textContent = proveedor.razonsocial || proveedor.tabla_proveedores || proveedor.nombre || "SIN NOMBRE";
+                            document.getElementById('del_direccion').textContent = proveedor.direccion;
+                            document.getElementById('del_telefono').textContent = proveedor.telefono;
+                            document.getElementById('del_ciudad').textContent = proveedor.ciudad;
+                            modalDelProveedor.show();
+                        }
+                    }
+                });
+
+                // Evento para el botón eliminar dentro del modal (Ejecuta Alertify)
+               document.getElementById('btnConfirmarEliminar').addEventListener('click', function() {
+                    const id = parseInt(document.getElementById('del_idproveedor').value);
+                    alertify.confirm("Eliminar proveedor", "¿Realmente deseas eliminar de forma permanente a este proveedor?",
+                        function(){
+                            proveedores = proveedores.filter(p => p.idproveedor !== id);
+                            guardarProveedores(proveedores);
+                            tabla.clear().rows.add(proveedores).draw();
+                            modalDelProveedor.hide();
+                            alertify.success("Proveedor eliminado correctamente");
+                        },
+                        function(){
+                            modalDelProveedor.hide();
+                            alertify.error("Eliminación cancelada");
+                        }
+                    ).set('labels', {ok:'Sí, eliminar', cancel:'Cancelar'});
+                });
+            });
+            //------------------------------------------------------------------------------
+            //------------------------------------------------------------------------------
+            function cargarTablaProveedores(){
+                if ($.fn.DataTable.isDataTable('#tabla_proveedores')) {
+                    $('#tabla_proveedores').DataTable().destroy();
+                }
+
+                // Inicializar el DataTable
+                tabla = new DataTable("#tabla_proveedores", {
+                        data: proveedores,
+                        columns: [
+                            { data: 'idproveedor', title: 'Id Proveedor' },
+                            { data: 'ruc', title: 'RUC' },
+                            { 
+                                data: null, 
+                                title: 'Razón Social',
+                                render: function(data, type, row) {
+                                    return row.razonsocial || row.tabla_proveedores || row.nombre || "SIN NOMBRE";
+                                }
+                            },
+                            { data: 'direccion', title: 'Dirección' },
+                            { data: 'telefono', title: 'Teléfono' },
+                            { data: 'ciudad', title: 'Ciudad' },
+                            {
+                                data: null,
+                                title: 'Acciones',
+                                render: function (data, type, row) {
+                                return `
+                                    <button class="btn btn-sm btn-warning me-1 btn-editar" data-id="${row.idproveedor}"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-sm btn-danger btn-eliminar" data-id="${row.idproveedor}"><i class="bi bi-trash"></i></button>
+                                `;
+                                }
+                            }
+                        ],
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'print',
+                                text: '<i class="bi bi-printer"></i> Imprimir',
+                                exportOptions: { columns: [0, 1, 2, 3, 4, 5] } // Aseguramos no incluir los botones
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="bi bi-filetype-xlsx"></i> Exportar a Excel',
+                                title: 'PUNTO ELEGANCIA - REPORTE PROVEEDORES',
+                                exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5] // Excluye columna de acciones
+                                },
+                                title: 'PUNTO ELEGANCIA - REPORTE PROVEEDORES', // Dejamos el título por defecto vacío para usar nuestro propio encabezado
+                                customize: function (doc) {
+                                    // 1. Obtener fecha y hora
+                                    const now = new Date();
+                                    const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                    const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                                    // 2. CREAR EL ENCABEZADO (Estilo Usuarios)
+                                    doc.content.splice(0, 0, {
+                                        margin: [0, 0, 0, 12], // Margen inferior para separarlo de la tabla
+                                        table: {
+                                            widths: [100, '*', 'auto'], // 3 columnas: Izquierda, Centro, Derecha
+                                            body: [
+                                                [
+                                                    // Columna Izquierda (Nombre de Empresa)
+                                                    { 
+                                                        text: 'PUNTO\nELEGANCIA', 
+                                                        fontSize: 14, 
+                                                        bold: true, 
+                                                        color: '#4e73df', 
+                                                        alignment: 'center' 
+                                                    },
+                                                    // Columna Central (Títulos y Ubicación)
+                                                    {
+                                                        stack: [
+                                                            { text: 'REPORTE DE PROVEEDORES', fontSize: 16, bold: true },
+                                                            { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
+                                                            { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                                        ],
+                                                        alignment: 'left',
+                                                        margin: [10, 0, 0, 0]
+                                                    },
+                                                    // Columna Derecha (Datos del documento)
+                                                    {
+                                                        stack: [
+                                                            { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                            { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                        ]
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        layout: 'noBorders' // Quita los bordes de la tabla del encabezado
+                                    });
+
+                                    // 3. ESTILIZAR LA TABLA DE DATOS (Bordes suaves)
+                                    var objLayout = {};
+                                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['paddingLeft'] = function(i) { return 4; };
+                                    objLayout['paddingRight'] = function(i) { return 4; };
+                                    doc.content[1].layout = objLayout; // Aplicamos a doc.content[1] porque el 0 ahora es el encabezado
+
+                                    // 4. AJUSTAR ANCHOS DE COLUMNAS
+                                    if (doc.content[1].table !== undefined) {
+                                        const tableNode = doc.content[1];
+                                        if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                            // El '*' hará que la columna de la 'Dirección' se expanda para ocupar el espacio sobrante
+                                            tableNode.table.widths = ['auto', 'auto', 'auto', 'auto', '*', 'auto'];
+                                        }
+                                    }
+
+                                    // 5. PIE DE PÁGINA MEJORADO
+                                    doc.footer = function(currentPage, pageCount) {
+                                        return {
+                                            columns: [
+                                                {
+                                                    alignment: 'left',
+                                                    text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'),
+                                                    margin: [40, 10], 
+                                                    fontSize: 8
+                                                },
+                                                {
+                                                    alignment: 'right',
+                                                    text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(),
+                                                    margin: [40, 10],
+                                                    fontSize: 8
+                                                }
+                                            ]
+                                        };
+                                    };
+                                }
+                            },
+                            {
+                                text: '<i class="bi bi-file-earmark-plus"></i> Nuevo proveedor',
+                                className: 'btn btn-sm btn-primary',
+                                action: function (e, dt, node, config) {
+                                    document.getElementById('formNuevoProveedor').reset();
+                                    $('#modalNuevoProveedor').modal('show');
+                                }
+                            }
+                        ],
+                        responsive: true,
+                        language: spanish,
+                        initComplete: function () {
+                            $('.dt-button:contains("Nuevo proveedor")').removeClass('dt-button').addClass('btn btn-sm btn-primary');
+                            $('.dt-button.buttons-print').removeClass('dt-button').addClass('btn btn-sm btn-info');
+                            $('.dt-button.buttons-excel').removeClass('dt-button').addClass('btn btn-sm btn-success');
+                            $('.dt-button.buttons-pdf').removeClass('dt-button').addClass('btn btn-sm btn-danger');
+                        }
+                });
+            }
+            //------------------------------------------------------------------------------
+            function guardarProveedores(data) {
+                localStorage.setItem('proveedores', JSON.stringify(data));
+            }
+            //------------------------------------------------------------------------------
+            function obtenerSiguienteId(proveedores) {
+                if (proveedores.length === 0){
+                        return 1;
+                }else{
+                        const maxId = Math.max(...proveedores.map(p => p.idproveedor || 0));
+                        return maxId + 1;
+                }
+            }
+            //------------------------------------------------------------------------------
+
+        </script>
+</body>
+</html>

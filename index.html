@@ -94,7 +94,20 @@
                              </tr>
                         </thead>
                     </table>
-                   
+                   <!-- CLIENTES -->
+                    <p class="fw-bold text-primary">CLIENTES</p>
+                    <table id="tabla_clientes_bd" class="display compact" style="width:100%">
+                        <thead>
+                             <tr>
+                                  <th>Id Cliente</th>
+                                  <th>N° Cédula</th>
+                                  <th>Nombre</th>
+                                  <th>Celular</th>
+                                  <th>Dirección</th>
+                                  <th>Ciudad</th>
+                             </tr>
+                        </thead>
+                    </table>
                    <!-- PROVEEDORES -->
                    <p class="fw-bold text-primary">PROVEEDORES</p>
                    <table id="tabla_proveedores" class="display compact" style="width:100%">
@@ -276,6 +289,39 @@
         }
         //-------------------------------------------------------------------------------------
         function verBD(){
+            // -------------------------------------------------------------------------
+            // Recuperar el array de objetos desde localStorage. CLIENTES
+            // ESTA CONFIGURACIÓN PREVIENE EL ERROR NEGRO DE DATATABLES EN TODAS LAS TABLAS
+            $.extend(true, $.fn.dataTable.defaults, {
+                columnDefs: [{ targets: "_all", defaultContent: "" }]
+            });
+
+            // -------------------------------------------------------------------------
+            // Recuperar el array de objetos desde localStorage. CLIENTES
+            var clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+            
+            // Si ya existe una instancia de DataTable, destruirla
+            if ($.fn.DataTable.isDataTable("#tabla_clientes_bd")) {
+                $('#tabla_clientes_bd').DataTable().clear().destroy();
+            }
+
+            // Inicializar el DataTable de Clientes
+            tabla = new DataTable("#tabla_clientes_bd", {
+                    data: clientes,
+                    columns: [
+                        { data: 'idcliente', title: 'Id Cliente' },
+                        { data: 'cedula', title: 'N° Cédula' },
+                        { data: 'nombre', title: 'Nombre' },
+                        { data: 'celular', title: 'Celular' },
+                        { data: 'direccion', title: 'Dirección' },
+                        { data: 'ciudad', title: 'Ciudad' }
+                    ],
+                    language: spanish,
+                    searching: false,    // Oculta el buscador
+                    lengthChange: false, // Oculta el selector de cantidad de registros por página
+                    pageLength: 5        // Número de registros por página
+            });
+            // -------------------------------------------------------------------------
             // Recuperar el array de objetos desde localStorage. USUARIOS
             var usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
             
@@ -315,7 +361,7 @@
                     columns: [
                         { data: 'idproveedor', title: 'Id Proveedor' },
                         { data: 'ruc', title: 'RUC' },
-                        { data: 'tabla_proveedores', title: 'Proveedor' },
+                        { data: 'tabla_proveedores', title: 'Razon Social'},
                         { data: 'direccion', title: 'Dirección' },
                         { data: 'telefono', title: 'Teléfono' },
                         { data: 'ciudad', title: 'Ciudad' }

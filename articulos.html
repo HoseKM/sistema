@@ -59,18 +59,18 @@
             </main>
         </div>
     </div>
-
+// Modal Nuevo Artículo 
         <div class="modal fade" id="modalNuevoArticulo" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <form id="formNuevoArticulo" class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Registrar Nuevo Artículo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Código de Barras</label>
-                            <input type="text" id="new_codbarra" class="form-control" required>
+                            <input type="number" id="new_codbarra" class="form-control" required min="1">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
@@ -78,17 +78,28 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Costo (Gs)</label>
-                                <input type="number" id="new_costo" class="form-control" required>
+                                <label class="form-label">Costo de compra</label>
+                                <input type="number" id="new_costo" class="form-control" required min="1">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Venta (Gs)</label>
-                                <input type="number" id="new_preventa" class="form-control" required>
+                                <label class="form-label">Precio de venta</label>
+                                <input type="number" id="new_preventa" class="form-control" required min="1">
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Stock Actual</label>
-                            <input type="number" id="new_stockactual" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock Actual</label>
+                                <input type="number" id="new_stockactual" class="form-control" required min="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de I.V.A.</label>
+                                <select id="new_tiva" class="form-select" required>
+                                    <option value="" disabled selected>Seleccione I.V.A.</option>
+                                    <option value="0">Exenta (0%)</option>
+                                    <option value="5">5%</option>
+                                    <option value="10">10%</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -98,9 +109,88 @@
                 </form>
             </div>
         </div>
+//Modificar Artículo
+        <div class="modal fade" id="modalEditarArticulo" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <form id="formEditarArticulo" class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Modificar Artículo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_idarticulo">
+                        <div class="mb-3">
+                            <label class="form-label">Código de Barras</label>
+                            <input type="number" id="edit_codbarra" class="form-control" required min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción del Producto</label>
+                            <input type="text" id="edit_descripcion" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Costo de compra</label>
+                                <input type="number" id="edit_costo" class="form-control" required min="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Precio de venta</label>
+                                <input type="number" id="edit_preventa" class="form-control" required min="1">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock Actual</label>
+                                <input type="number" id="edit_stockactual" class="form-control" required min="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de I.V.A.</label>
+                                <select id="edit_tiva" class="form-select" required>
+                                    <option value="0">Exenta (0%)</option>
+                                    <option value="5">5%</option>
+                                    <option value="10">10%</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal fade" id="modalEliminarArticulo" tabindex="-1" aria-labelledby="modalEliminarArticuloLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="modalEliminarArticuloLabel"><i class="bi bi-exclamation-triangle-fill"></i> Eliminar Artículo</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                            <p class="text-center fw-bold">¿Deseas proceder con la eliminación de este artículo?</p>
+                            <input type="hidden" id="del_idarticulo">
+                            
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item"><strong>ID Artículo:</strong> <span id="del_id"></span></li>
+                                <li class="list-group-item"><strong>Código de Barras:</strong> <span id="del_codbarra"></span></li>
+                                <li class="list-group-item"><strong>Descripción:</strong> <span id="del_descripcion"></span></li>
+                                <li class="list-group-item"><strong>Costo de compra:</strong> <span id="del_costo"></span></li>
+                                <li class="list-group-item"><strong>Precio de venta:</strong> <span id="del_preventa"></span></li>
+                                <li class="list-group-item"><strong>Stock Actual:</strong> <span id="del_stockactual"></span></li>
+                                <li class="list-group-item"><strong>Tipo de I.V.A.:</strong> <span id="del_tiva"></span></li>
+                            </ul>
+                    </div>
+                    <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="btnConfirmarEliminarArticulo"><i class="bi bi-trash"></i> Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        //Fin de Nuevo Artículo
         <footer class="py-4 bg-light mt-auto">
-            </footer>
-    </div> </div> <script src="dt/jquery-3.7.1.js"></script>
+
+        </div> </div> <script src="dt/jquery-3.7.1.js"></script>
 
     <div class="modal fade" id="modalEditarArticulo" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
@@ -185,36 +275,59 @@
         // 3. Cargar la Tabla
         cargarTablaArticulos();
 
+
         // --- EVENTO GUARDAR NUEVO ---
         $('#formNuevoArticulo').on('submit', function (e) {
             e.preventDefault();
+            
             // Capturamos los valores
-            const desc = $('#new_descripcion').val();
-            const cod = $('#new_codbarra').val();
-            // Validación de seguridad para evitar el error de tu captura
-            if (!desc || !cod) {
-             alertify.error("Por favor, complete la descripción y el código");
-            return;
-             }
+            const desc = $('#new_descripcion').val().trim();
+            const cod = parseInt($('#new_codbarra').val());
+            const costo = parseFloat($('#new_costo').val());
+            const preventa = parseFloat($('#new_preventa').val());
+            const stock = parseInt($('#new_stockactual').val());
+            const tiva = parseInt($('#new_tiva').val()); 
+
+            // VALIDACIONES ESTRICTAS DESDE JAVASCRIPT
+            if (!desc || isNaN(cod)) {
+                alertify.error("Por favor, complete la descripción y el código");
+                return;
+            }
+            if (cod <= 0 || costo <= 0 || preventa <= 0 || stock <= 0) {
+                alertify.error("Código, Costo, Precio y Stock deben ser mayores a cero.");
+                return;
+            }
+        
+            // ====================================================================
+            // NUEVO: VALIDACIÓN DE CÓDIGO DE BARRAS DUPLICADO
+            // ====================================================================
+            const existeCodBarra = articulos.some(a => a.codbarra == cod.toString());
+            if (existeCodBarra) {
+                alertify.error("Error: El Código de Barras ya está registrado en otro artículo.");
+                $('#new_codbarra').focus(); // Llevamos el cursor al campo del error
+                return; // Cortamos la ejecución para que no se guarde
+            }
+
             const nuevoId = articulos.length > 0 ? Math.max(...articulos.map(a => a.idarticulo)) + 1 : 1;
             
-             const nuevoArt = {
+            const nuevoArt = {
                 idarticulo: nuevoId,
-                codbarra: $('#new_codbarra').val(),
-                descripcion: $('#new_descripcion').val().toUpperCase(),
-                idmarca: parseInt($('#new_idmarca').val()),
-                nom_marca: $("#new_idmarca option:selected").text(), // Captura el texto (ZARA, NIKE, etc.)
-                idclasificacion: parseInt($('#new_idclasificacion').val()),
-                nom_clasificacion: $("#new_idclasificacion option:selected").text(), // Captura el texto (REMERAS, JEANS, etc.)
-                costo: parseFloat($('#new_costo').val()),
-                preventa: parseFloat($('#new_preventa').val()),
-                stockactual: parseInt($('#new_stockactual').val())
+                codbarra: cod.toString(), 
+                descripcion: desc.toUpperCase(),
+                idmarca: 1, 
+                nom_marca: "GENERAL", 
+                idclasificacion: 1, 
+                nom_clasificacion: "VARIOS", 
+                costo: costo,
+                preventa: preventa,
+                stockactual: stock,
+                tiva: tiva
             };
 
             articulos.push(nuevoArt);
-            localStorage.setItem('articulos', JSON.stringify(articulos)); // Guardar
-            tabla.clear().rows.add(articulos).draw(); // Refrescar tabla
-            guardarYRefrescar("Artículo registrado con éxito");
+            localStorage.setItem('articulos', JSON.stringify(articulos)); 
+            tabla.clear().rows.add(articulos).draw(); 
+            
             $('#modalNuevoArticulo').modal('hide');
             this.reset();
             alertify.success("Artículo registrado con éxito");
@@ -223,17 +336,90 @@
         // --- EVENTO GUARDAR EDICIÓN ---
         $('#formEditarArticulo').on('submit', function (e) {
             e.preventDefault();
-            const id = $('#edit_idarticulo').val();
-            const index = articulos.findIndex(a => a.idarticulo == id);
+            const id = parseInt($('#edit_idarticulo').val());
+            const index = articulos.findIndex(a => a.idarticulo === id);
 
             if (index !== -1) {
-                articulos[index].descripcion = $('#edit_descripcion').val().toUpperCase();
-                articulos[index].costo = parseFloat($('#edit_costo').val());
-                articulos[index].preventa = parseFloat($('#edit_preventa').val());
-                articulos[index].stockactual = parseInt($('#edit_stockactual').val());
+                // Captura y validación en edición
+                const cod = parseInt($('#edit_codbarra').val());
+                const costo = parseFloat($('#edit_costo').val());
+                const preventa = parseFloat($('#edit_preventa').val());
+                const stock = parseInt($('#edit_stockactual').val());
 
-                guardarYRefrescar("Artículo actualizado");
+                if (cod <= 0 || costo <= 0 || preventa <= 0 || stock <= 0) {
+                    alertify.error("Los valores numéricos deben ser mayores a cero.");
+                    return;
+                }
+
+                // ====================================================================
+                // NUEVO: VALIDACIÓN DE CÓDIGO DUPLICADO (Excluyendo el artículo actual)
+                // ====================================================================
+                const existeCodBarra = articulos.some(a => a.codbarra == cod.toString() && a.idarticulo !== id);
+                if (existeCodBarra) {
+                    alertify.error("Error: El Código de Barras ya está asignado a otro artículo.");
+                    $('#edit_codbarra').focus();
+                    return;
+                }
+
+                articulos[index].codbarra = cod.toString();
+                articulos[index].descripcion = $('#edit_descripcion').val().toUpperCase();
+                articulos[index].costo = costo;
+                articulos[index].preventa = preventa;
+                articulos[index].stockactual = stock;
+                articulos[index].tiva = parseInt($('#edit_tiva').val());
+
+                guardarYRefrescar("Artículo actualizado correctamente");
                 $('#modalEditarArticulo').modal('hide');
+            }
+        });
+
+        // --- EVENTO GUARDAR EDICIÓN CON VALIDACIÓN DE DUPLICADOS ---
+        $('#formEditarArticulo').on('submit', function (e) {
+            e.preventDefault();
+            
+            const id = parseInt($('#edit_idarticulo').val());
+            const index = articulos.findIndex(a => a.idarticulo === id);
+
+            if (index !== -1) {
+                // Captura de las cajas de texto del modal
+                const codbarraInput = $('#edit_codbarra').val().trim();
+                const costo = parseFloat($('#edit_costo').val());
+                const preventa = parseFloat($('#edit_preventa').val());
+                const stock = parseInt($('#edit_stockactual').val());
+                const tiva = parseInt($('#edit_tiva').val());
+
+                // Validar que los valores numéricos sean mayores a cero
+                if (parseInt(codbarraInput) <= 0 || costo <= 0 || preventa <= 0 || stock <= 0) {
+                    alertify.error("Los valores numéricos (Código, Costo, Venta y Stock) deben ser mayores a cero.");
+                    return;
+                }
+
+                // ====================================================================
+                // RESTRICCIÓN: VALIDACIÓN DE CÓDIGO DE BARRAS DUPLICADO
+                // ====================================================================
+                // Comprobamos si existe OTRO artículo (a.idarticulo !== id) con ese mismo código
+                const existeCodBarraDuplicado = articulos.some(a => a.codbarra.toString().trim() === codbarraInput && a.idarticulo !== id);
+                if (existeCodBarraDuplicado) {
+                    alertify.error("Error: El Código de Barras ingresado ya pertenece a otro artículo.");
+                    $('#edit_codbarra').focus(); // Lleva el cursor directamente al campo erróneo
+                    return; // Frena por completo la actualización
+                }
+
+                // Si pasa la validación, actualizamos de forma segura todas las propiedades en el arreglo
+                articulos[index].codbarra = codbarraInput;
+                articulos[index].descripcion = $('#edit_descripcion').val().toUpperCase().trim();
+                articulos[index].costo = costo;
+                articulos[index].preventa = preventa;
+                articulos[index].stockactual = stock;
+                articulos[index].tiva = tiva;
+
+                // Persistencia de datos en LocalStorage y redibujado de la tabla
+                guardarYRefrescar("Artículo actualizado correctamente.");
+                
+                // Cerrar la ventana de Bootstrap
+                $('#modalEditarArticulo').modal('hide');
+            } else {
+                alertify.error("Error crítico: No se logró encontrar el artículo original.");
             }
         });
     });
@@ -289,73 +475,96 @@
                 exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
             },
             {
-                extend: 'pdf',
-                text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
-                className: 'btn btn-danger btn-sm',
-                orientation: 'landscape',
-                pageSize:'A4',
-                title: '', //aqui ira el membrete
-                exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] },
-                customize: function (doc) {
-                // --- MEMBRETE Y LOGO ---
-                // doc.content[0] es el título, lo reemplazamos por un diseño profesional
-                doc.content.splice(0, 0, {
-                    margin: [0, 0, 0, 12],
-                    table: {
-                        widths: [80, '*', 'auto'],
-                        body: [
-                            [
-                                // Aquí iría tu logo en Base64 (puedes dejarlo vacío o poner texto)
-                                { text: 'PUNTO\nELEGANCIA', fontSize: 14, bold: true, color: '#4e73df', alignment: 'center' },
-                                {
-                                    stack: [
-                                        { text: 'REPORTE ARTICULOS', fontSize: 16, bold: true },
-                                        { text: 'Venta de Ropa y Accesorios', fontSize: 10, color: '#666' },
-                                        { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
-                                    ],
-                                    alignment: 'left',
-                                    margin: [10, 0, 0, 0]
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                                filename: 'Reporte_de_Articulos', 
+                                orientation: 'landscape', // Hoja horizontal
+                                pageSize: 'A4',
+                                exportOptions: {
+                                    columns: [0, 1, 2, 3, 4, 5, 6, 7] // <-- INCLUYE HASTA LA COLUMNA 7 (STOCK)
                                 },
-                                {
-                                    stack: [
-                                        { text: 'INFORME DE ARTÍCULOS', fontSize: 12, bold: true, alignment: 'right' },
-                                        { text: 'Fecha: ' + new Date().toLocaleDateString(), fontSize: 10, alignment: 'right' },
-                                        { text: 'Hora: ' + new Date().toLocaleTimeString(), fontSize: 10, alignment: 'right' }
-                                    ]
-                                }
-                            ]
-                        ]
-                    },
-                    layout: 'noBorders'
-                });
-                // --- NÚMERO DE PÁGINA (FOOTER) ---
-                var objLayout = {};
-                objLayout['hLineWidth'] = function(i) { return .5; };
-                objLayout['vLineWidth'] = function(i) { return .5; };
-                objLayout['hLineColor'] = function(i) { return '#aaa'; };
-                objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                objLayout['paddingLeft'] = function(i) { return 4; };
-                objLayout['paddingRight'] = function(i) { return 4; };
-                doc.content[1].layout = objLayout; // Aplica bordes finos a la tabla de datos
+                                title: '', 
+                                customize: function (doc) {
+                                    const now = new Date();
+                                    const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                    const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-                doc['footer'] = (function(page, pages) {
-                    return {
-                        columns: [
-                            {
-                                alignment: 'left',
-                                text: ['Impreso por: ', { text: localStorage.getItem("nomUsuario") || 'Sistema' }]
+                                    // ENCABEZADO
+                                    doc.content.splice(0, 0, {
+                                        margin: [0, 0, 0, 12], 
+                                        table: {
+                                            widths: [100, '*', 'auto'], 
+                                            body: [
+                                                [
+                                                    { 
+                                                        text: 'PUNTO\nELEGANCIA', 
+                                                        fontSize: 14, 
+                                                        bold: true, 
+                                                        color: '#4e73df', 
+                                                        alignment: 'center' 
+                                                    },
+                                                    {
+                                                        stack: [
+                                                            { text: 'REPORTE DE ARTÍCULOS', fontSize: 16, bold: true },
+                                                            { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
+                                                            { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                                        ],
+                                                        alignment: 'left',
+                                                        margin: [10, 0, 0, 0]
+                                                    },
+                                                    {
+                                                        stack: [
+                                                            { text: 'INFORME DE INVENTARIO', fontSize: 12, bold: true, alignment: 'right' },
+                                                            { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                            { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                        ]
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        layout: 'noBorders' 
+                                    });
+
+                                    // ESTILIZAR BORDES
+                                    var objLayout = {};
+                                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                                    objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                                    objLayout['paddingLeft'] = function(i) { return 4; };
+                                    objLayout['paddingRight'] = function(i) { return 4; };
+                                    doc.content[1].layout = objLayout; 
+
+                                    // ASIGNAR 8 ANCHOS EXACTOS
+                                    if (doc.content[1].table !== undefined) {
+                                        const tableNode = doc.content[1];
+                                        if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                            // 8 anchos: El '*' es para que la 'Descripción' absorba el espacio libre
+                                            tableNode.table.widths = ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'];
+                                        }
+                                    }
+
+                                    // PIE DE PÁGINA
+                                    doc.footer = function(currentPage, pageCount) {
+                                        return {
+                                            columns: [
+                                                {
+                                                    alignment: 'left',
+                                                    text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'),
+                                                    margin: [40, 10], 
+                                                    fontSize: 8
+                                                },
+                                                {
+                                                    alignment: 'right',
+                                                    text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(),
+                                                    margin: [40, 10],
+                                                    fontSize: 8
+                                                }
+                                            ]
+                                        };
+                                    };
+                                }
                             },
-                            {
-                                alignment: 'right',
-                                text: ['Página ', { text: page.toString() }, ' de ', { text: pages.toString() }]
-                            }
-                        ],
-                        margin: [40, 0],
-                        fontSize: 9
-                    }
-                });
-            }
-            },
             {
                 extend: 'print',
                 text: '<i class="bi bi-printer"></i> Imprimir',
@@ -375,27 +584,81 @@
         alertify.success(mensaje);
     }
 
-    // Eventos delegados para botones de fila
+
+    // --- EVENTO PARA ABRIR MODAL EDITAR Y CARGAR DATOS COMPLETOS ---
     $(document).on('click', '.btn-editar', function() {
         const id = $(this).data('id');
         const art = articulos.find(a => a.idarticulo == id);
+        
         if (art) {
+            // 1. Cargar todos los controles con la información del artículo seleccionado
             $('#edit_idarticulo').val(art.idarticulo);
+            $('#edit_codbarra').val(art.codbarra); // <-- CORRECCIÓN: Ahora sí trae el código de barras
             $('#edit_descripcion').val(art.descripcion);
             $('#edit_costo').val(art.costo);
             $('#edit_preventa').val(art.preventa);
             $('#edit_stockactual').val(art.stockactual);
+            
+            // Cargar el tipo de I.V.A. asignado (si no tiene, se pone 10 por defecto)
+            if (art.tiva !== undefined) {
+                $('#edit_tiva').val(art.tiva);
+            } else {
+                $('#edit_tiva').val("10"); 
+            }
+            
+            // 2. Mostrar el modal de edición
             $('#modalEditarArticulo').modal('show');
         }
     });
-
+    const modalDelArticulo = new bootstrap.Modal(document.getElementById('modalEliminarArticulo'));
     $(document).on('click', '.btn-eliminar', function() {
         const id = $(this).data('id');
-        alertify.confirm("Eliminar", "¿Seguro que desea eliminar este artículo?", 
-        function() {
-            articulos = articulos.filter(a => a.idarticulo != id);
-            guardarYRefrescar("Eliminado correctamente");
-        }, null);
+        const art = articulos.find(a => a.idarticulo == id);
+        
+        if (art) {
+            // Cargamos los datos en las etiquetas del modal
+            document.getElementById('del_idarticulo').value = art.idarticulo;
+            document.getElementById('del_id').textContent = art.idarticulo;
+            document.getElementById('del_codbarra').textContent = art.codbarra;
+            document.getElementById('del_descripcion').textContent = art.descripcion;
+            
+            // Le damos formato de moneda a los precios para que se vea más profesional
+            document.getElementById('del_costo').textContent = 'Gs ' + parseFloat(art.costo || 0).toLocaleString('es-PY');
+            document.getElementById('del_preventa').textContent = 'Gs ' + parseFloat(art.preventa || 0).toLocaleString('es-PY');
+            document.getElementById('del_stockactual').textContent = art.stockactual;
+            
+            // Interpretamos el IVA
+            let textoIva = "Exenta (0%)";
+            if (art.tiva === 5) textoIva = "5%";
+            if (art.tiva === 10) textoIva = "10%";
+            document.getElementById('del_tiva').textContent = textoIva;
+
+            // Mostramos el modal
+            modalDelArticulo.show();
+        }
+    });
+
+    // 3. Evento al confirmar la eliminación dentro del modal
+    document.getElementById('btnConfirmarEliminarArticulo').addEventListener('click', function() {
+        const id = parseInt(document.getElementById('del_idarticulo').value);
+        
+        // Alerta de seguridad final
+        alertify.confirm("Eliminar artículo", "¿Realmente deseas eliminar de forma permanente este artículo del inventario?",
+            function(){ // Si el usuario dice que SÍ
+                // Borramos el artículo del arreglo
+                articulos = articulos.filter(a => a.idarticulo !== id);
+                
+                // Guardamos en LocalStorage y actualizamos la tabla
+                guardarYRefrescar("Artículo eliminado correctamente");
+                
+                // Cerramos el modal
+                modalDelArticulo.hide();
+            },
+            function(){ // Si el usuario CANCELA
+                modalDelArticulo.hide();
+                alertify.error("Eliminación cancelada");
+            }
+        ).set('labels', {ok:'Sí, eliminar', cancel:'Cancelar'});
     });
     
 </script>

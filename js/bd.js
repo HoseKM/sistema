@@ -124,7 +124,7 @@ function datos(){
         {
             idproveedor: 4,
             ruc: "80022334-1",
-            tabla_proveedores: "TEXTIL GUAIREÑA S.A.",
+           tabla_proveedores: "TEXTIL GUAIREÑA S.A.",
             direccion: "AV. MARISCAL LÓPEZ ESQ. LIBERTAD",
             telefono: "021-550660",
             ciudad: "ASUNCIÓN"
@@ -422,7 +422,7 @@ var articulos = [
         costo: 500000
     }
 ];
-localStorage.setItem("articulos", JSON.stringify(articulos));
+    //localStorage.setItem("articulos", JSON.stringify(articulos));
     localStorage.setItem("articulos", JSON.stringify(articulos));
 
     // CREAR UN ARRAY de objetos: compras---------------------------------------------
@@ -467,9 +467,93 @@ localStorage.setItem("articulos", JSON.stringify(articulos));
             subtotal: 400000
         }
     ];
-
     // Guardar en localStorage como cadena JSON
     localStorage.setItem("comprascabecera", JSON.stringify(comprascabecera));
     localStorage.setItem("comprasdetalle", JSON.stringify(comprasdetalle));
     //---------------------------------------------------------------------------------
+
+    // CREAR UN ARRAY de objetos: clientes-----------------------------------------
+    var clientes = [
+        {
+            idcliente: 1,
+            cedula: "4567890",
+            nombre: "JUAN PEREZ",
+            celular: "0981-123456",
+            direccion: "CALLE FALSA 123",
+            ciudad: "ASUNCIÓN"
+        },
+        {
+            idcliente: 2,
+            cedula: "3456789",
+            nombre: "MARIA GONZALEZ",
+            celular: "0971-987654",
+            direccion: "AVENIDA MARISCAL LOPEZ 45",
+            ciudad: "CIUDAD DEL ESTE"
+        },
+        {
+            idcliente: 3,
+            cedula: "5678901",
+            nombre: "CARLOS GOMEZ",
+            celular: "0991-456789",
+            direccion: "RUTA 1 KM 15",
+            ciudad: "SAN LORENZO"
+        },
+        {
+            idcliente: 4,
+            cedula: "2345678",
+            nombre: "ANA MARTINEZ",
+            celular: "0982-112233",
+            direccion: "BARRIO OBRERO",
+            ciudad: "PEDRO JUAN CABALLERO"
+        },
+        {
+            idcliente: 5,
+            cedula: "6789012",
+            nombre: "LUIS RAMIREZ",
+            celular: "0972-334455",
+            direccion: "AV. AGUSTÍN FERNANDO DE PINEDO",
+            ciudad: "CONCEPCIÓN"
+        },
+        {
+            idcliente: 6,
+            cedula: "1234567",
+            nombre: "CARMEN LOPEZ",
+            celular: "0992-556677",
+            direccion: "CENTRO HISTORICO",
+            ciudad: "ENCARNACIÓN"
+        },
+        {
+            idcliente: 7,
+            cedula: "7890123",
+            nombre: "ROBERTO FERNANDEZ",
+            celular: "0983-778899",
+            direccion: "AV. SAN MARTIN",
+            ciudad: "ASUNCIÓN"
+        },
+        {
+            idcliente: 8,
+            cedula: "8901234",
+            nombre: "LAURA SOSA",
+            celular: "0973-990011",
+            direccion: "BARRIO LAS CARMELITAS",
+            ciudad: "ASUNCIÓN"
+        },
+        {
+            idcliente: 9,
+            cedula: "9012345",
+            nombre: "DIEGO CABALLERO",
+            celular: "0993-223344",
+            direccion: "CALLE PALMA 456",
+            ciudad: "ASUNCIÓN"
+        },
+        {
+            idcliente: 10,
+            cedula: "1122334",
+            nombre: "SARA BENITEZ",
+            celular: "0984-556677",
+            direccion: "AV. IRRAZABAL",
+            ciudad: "ENCARNACIÓN"
+        }
+    ];
+    localStorage.setItem("clientes", JSON.stringify(clientes));
 }
