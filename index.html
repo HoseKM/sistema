@@ -19,15 +19,28 @@
     <link rel="stylesheet" href="alert/alertify.min.css">
     <link rel="stylesheet" href="alert/themes/default.min.css">
 
+    <style>
+        #Login_backround {
+            border-radius: 0% 0% 20% 20%; /*BORDE PARA EL LOGIN */
+            width: 500px;
+            background: linear-gradient(60deg, #ffff, #fff0); /* Fondo blanco con opacidad */
+             /* Degradado de blanco a transparente */
+             box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+        }
+        #Login_header {
+            border-radius: 0% 0% 0% 0%; /*BORDE PARA EL HEADER DEL LOGIN */
+            margin-top: 0%;
+            background: linear-gradient(45deg, #007bff, #00c6ff); /* Degradado de azul a celeste */
+        }
+    </style>
 </head>
 <body class="bg-body-secondary" style="background-image: url(img/fondotienda.jpg); background-size: cover; background-repeat: no-repeat;">
-    <div class="card col-md-6 border-primary  mx-auto mt-5">
-        
-        <div class="card-header bg-primary text-white text-center">
+    <div class="card col-md-6  mx-auto mt-5" id="Login_backround">
+        <div class="card-header bg-primary text-white text-center" id="Login_header">
             <h5 class="card-title">Inicio de sesión</h5>
-        </div>
-
+            </div>
         <div class="card-body">
+            
             <img src="img/logotienda.png" height="160px" alt="login" class="mx-auto d-block">
             <h3 class="text-center mt-2 fw-bold text-primary">Punto Estilo</h3>
             <form class="row g-3 mt-2" id="login" novalidate>
@@ -142,7 +155,7 @@
                                   <th>Id Clasificación</th>
                                   <th>Clasificación</th>
                              </tr>
-                        </thead>
+                        </thead>                        
                     </table>
 
                     <!-- ARTICULOS -->

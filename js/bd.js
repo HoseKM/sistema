@@ -11,6 +11,15 @@ function datos(){
             contrasena: "luis123"
         },
         {
+            idusuario: 1,
+            cedula: "655950",
+            nombre: "Samuel Parcero",
+            rol: "Administrador",
+            celular: "0971-123456",
+            usuario: "Samuel",
+            contrasena: "samuel123"
+        },
+        {
             idusuario: 2,
             cedula: "7250909",
             nombre: "Pedro Romero",
