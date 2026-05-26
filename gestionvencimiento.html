@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Vencimientos | Punto Elegancia</title>
+    <script src="js/seguridad.js"></script>
+    <!-- ESTILOS DEL MENU -->
+    <link href="menu/styles.css" rel="stylesheet" />
+  
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="dt/datatables.min.css">
+    <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <script src="dt/dataTables.keyTable.min.js"></script>
+
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <link rel="stylesheet" href="dt/keyTable.dataTables.min.css">
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <script src="dt/dataTables.select.min.js"></script>
+    <link rel="stylesheet" href="dt/select.dataTables.min.css">
+
+    <!-- ALERTIFYJS -->
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+    <script src="alert/alertify.min.js"></script>
+</head>
+<body class="sb-nav-fixed">
+
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+         
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Gestión de Vencimientos</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active">Vencimientos a Proveedores</li>
+                    </ol>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            <i class="bi bi-calendar-check me-1"></i> Asignación de Plazos de Pago
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaVencimientos" class="table table-bordered table-striped" style="width:100%">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Proveedor</th>
+                                        <th>N° Factura</th>
+                                        <th>Timbrado</th> 
+                                        <th>Fecha Compra</th> 
+                                        <th>Monto Deuda</th> 
+                                        <th>Plazo</th>
+                                        <th>Vencimiento</th>s
+                                        <th>Acción</th> </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVencimiento" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-clock-history"></i> Asignar Plazo de Pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formPlazos">
+                        <input type="hidden" id="v_idcompra">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Proveedor y Factura</label>
+                            <input type="text" id="v_datos" class="form-control" readonly>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-bold">Fecha de Compra</label>
+                                <input type="date" id="v_feccompra" class="form-control bg-light" readonly>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-bold text-primary">Plazo de Crédito</label>
+                                <select id="v_plazo" class="form-select border-primary" required>
+                                    <option value="" selected disabled>Seleccione plazo...</option>
+                                    <option value="15">QUINCENAL (15 Días)</option>
+                                    <option value="30">MENSUAL (30 Días)</option>
+                                    <option value="60">BIMESTRAL (60 Días)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">Fecha de Vencimiento Calculada</label>
+                            <input type="date" id="v_fecvencimiento" class="form-control border-danger" required>
+                            <small class="text-muted">Puedes modificar esta fecha manualmente si el proveedor te dio un día específico.</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarVencimiento"><i class="bi bi-save"></i> Guardar Vencimiento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/funcionesSistema.js"></script>
+    <!-- MENU -->
+    <script src="menu/bootstrap.bundle.min.js"></script>
+    <script src="menu/scripts.js"></script>
+    <!-- DATATABLES -->
+    <script src="dt/jquery-3.7.1.js"></script>
+    <script src="dt/jquery.dataTables.min.js"></script>
+    <script src="dt/datatables.min.js"></script>
+
+
+    <!-- DATATABLES Buttons extension -->
+    <script src="dt/dataTables.buttons.min.js"></script>
+    <script src="dt/buttons.print.min.js"></script>
+    <script src="dt/buttons.html5.min.js"></script>
+    <!-- DATATABLES JSZip y pdfmake para exportar -->
+    <script src="dt/jszip.min.js"></script>
+    <script src="dt/pdfmake.min.js"></script>
+    <script src="dt/vfs_fonts.js"></script>
+    <!-- DATATABLES Idioma Español -->
+    <script src="dt/es-ES.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComponentes(); // Carga sidebar y navbar automáticamente
+            cargarTablaVencimientos();
+        });
+
+        // 1. CARGAR LA TABLA DE COMPRAS A CRÉDITO
+        function cargarTablaVencimientos() {
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            let proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
+            
+            // Solo traemos compras a crédito que no estén anuladas
+            let creditos = compras.filter(c => c.condicion === "CRÉDITO" && c.anulado !== "SI");
+
+            // Inicializamos o recuperamos la instancia de DataTables
+            let tabla;
+            if ($.fn.DataTable.isDataTable('#tablaVencimientos')) {
+                tabla = $('#tablaVencimientos').DataTable();
+                tabla.clear(); 
+            } else {
+                tabla = $('#tablaVencimientos').DataTable({
+                    language: spanish,
+                    columnDefs: [
+                        { className: "text-center", targets: [0, 3, 4, 6, 7, 8] }, // Alineaciones centradas
+                        { className: "text-end fw-bold text-danger", targets: [5] }  // Monto Deuda a la derecha
+                    ]
+                });
+            }
+
+            // Cargamos los datos celda por celda
+            creditos.forEach(c => {
+                let prov = proveedores.find(p => p.idproveedor == c.idproveedor);
+                let nomProv = prov ? prov.tabla_proveedores : "DESCONOCIDO";
+
+                let estadoPlazo = c.plazo ? `<span class="badge bg-success">${c.plazo} Días</span>` : `<span class="badge bg-secondary">Sin asignar</span>`;
+                let fechaVenc = c.fechavencimiento ? c.fechavencimiento : "Pendiente";
+                let numTimbrado = c.timbrado ? c.timbrado : "---";
+
+                let btnGestionar = `<button class="btn btn-warning btn-sm btn-asignar" 
+                                        data-id="${c.idcompra}" 
+                                        data-prov="${nomProv}" 
+                                        data-fac="${c.numfactura}" 
+                                        data-feccompra="${c.feccompra}">
+                                        <i class="bi bi-calendar-plus"></i> Gestionar
+                                    </button>`;
+
+                // Estructura exacta de 9 elementos que se empareja con el HTML
+                tabla.row.add([
+                    c.idcompra,
+                    nomProv,
+                    c.numfactura,
+                    numTimbrado,
+                    c.feccompra,
+                    c.saldo.toLocaleString('es-PY') + " Gs.",
+                    estadoPlazo,
+                    fechaVenc,
+                    btnGestionar
+                ]);
+            });
+
+            // Dibujar la tabla actualizada
+            tabla.draw();
+        }
+
+        // 2. ABRIR MODAL Y PASAR DATOS
+        $(document).on('click', '.btn-asignar', function() {
+            document.getElementById('v_idcompra').value = $(this).data('id');
+            document.getElementById('v_datos').value = $(this).data('prov') + ' - Factura N°: ' + $(this).data('fac');
+            document.getElementById('v_feccompra').value = $(this).data('feccompra');
+            
+            // Limpiamos los campos antes de abrir
+            document.getElementById('v_plazo').value = "";
+            document.getElementById('v_fecvencimiento').value = "";
+
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalVencimiento'));
+            modal.show();
+        });
+
+        // 3. CALCULAR FECHA AUTOMÁTICAMENTE AL CAMBIAR EL PLAZO
+        document.getElementById('v_plazo').addEventListener('change', function() {
+            let diasPlazo = parseInt(this.value);
+            let fecCompraStr = document.getElementById('v_feccompra').value;
+            
+            if (fecCompraStr && !isNaN(diasPlazo)) {
+                // Generamos un objeto fecha y le sumamos un día extra por compensación de zona horaria local
+                let fechaObj = new Date(fecCompraStr + 'T00:00:00'); 
+                fechaObj.setDate(fechaObj.getDate() + diasPlazo);
+                
+                // Formateamos de vuelta a YYYY-MM-DD
+                let fechaCalculada = fechaObj.toISOString().split('T')[0];
+                document.getElementById('v_fecvencimiento').value = fechaCalculada;
+            }
+        });
+
+        // 4. GUARDAR EL VENCIMIENTO EN LA COMPRA
+        document.getElementById('btnGuardarVencimiento').addEventListener('click', function() {
+            let idcompra = parseInt(document.getElementById('v_idcompra').value);
+            let plazo = document.getElementById('v_plazo').value;
+            let fecVencimiento = document.getElementById('v_fecvencimiento').value;
+
+            if (!plazo || !fecVencimiento) {
+                alertify.error("Debe seleccionar un plazo y asegurar una fecha de vencimiento.");
+                return;
+            }
+
+            // Llamamos a la base de datos de cabeceras
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            
+            // Buscamos la compra y le agregamos/actualizamos las propiedades de vencimiento
+            let index = compras.findIndex(c => c.idcompra === idcompra);
+            if (index !== -1) {
+                compras[index].plazo = plazo;
+                compras[index].fechavencimiento = fecVencimiento;
+                
+                localStorage.setItem("comprascabecera", JSON.stringify(compras));
+                
+                alertify.success("Plazo de pago asignado correctamente.");
+                bootstrap.Modal.getInstance(document.getElementById('modalVencimiento')).hide();
+                cargarTablaVencimientos(); // Recarga la tabla para mostrar los cambios
+            } else {
+                alertify.error("Error: No se encontró la compra en la base de datos.");
+            }
+        });
+    </script>
+</body>
+</html>

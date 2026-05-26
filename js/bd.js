@@ -435,50 +435,61 @@ var articulos = [
     localStorage.setItem("articulos", JSON.stringify(articulos));
 
     // CREAR UN ARRAY de objetos: compras---------------------------------------------
-    var comprascabecera = [
-        {
-            idcompra: 1,
-            idcompra: 1,
-            idproveedor: 1, // DISTRIBUIDORA TEXTIL DEL NORTE (según tu tabla)
-            numfactura: "001-001-0004567",
-            feccompra: "2026-05-10", // Fecha actual de tu proyecto
-            condicion: "CONTADO",
-            stexenta: 0,
-            stiva5: 0,        // La ropa casi siempre es IVA 10%
-            stiva10: 900000,  // Todo el valor de la compra va aquí
-            totcompra: 900000,
-            liqiva5: 0,
-            liqiva10: 81818,  // Cálculo: 900.000 / 11
-            totiva: 81818,
-            saldo: 0,
-            anulado: "NO"
-        }
-    ];
-    var comprasdetalle = [
-        {
-            idcompradet: 1,
-            idcompra: 1,    // Vinculado a tu cabecera id:1
-            item: 1,
-            idarticulo: 2,  // JEAN SKINNY (que definimos antes)
-            cantidad: 2,
-            preuni: 250000, // Precio unitario ajustado
-            tiva: 10,       // Cambiado a 10% para que sea real
-            subtotal: 500000
-         },
-        {
-            idcompradet: 2,
-            idcompra: 1,
-            item: 2,
-            idarticulo: 1,  // REMERA ALGODÓN (que definimos antes)
-            cantidad: 4,    // Compramos 4 remeras
-            preuni: 100000, 
-            tiva: 10,
-            subtotal: 400000
-        }
-    ];
-    // Guardar en localStorage como cadena JSON
-    localStorage.setItem("comprascabecera", JSON.stringify(comprascabecera));
-    localStorage.setItem("comprasdetalle", JSON.stringify(comprasdetalle));
+   // CREAR UN ARRAY de objetos: compras---------------------------------------------
+    
+    // AQUÍ ESTÁ EL SEGURO PARA NO BORRAR TUS DATOS NUEVOS
+    if (!localStorage.getItem("comprascabecera")) {
+        
+        var comprascabecera = [
+            {
+                idcompra: 1,
+                idproveedor: 1, 
+                numfactura: "001-001-0004567",
+                timbrado: "11223344",
+                feccompra: "2026-05-10", 
+                condicion: "CONTADO",
+                stexenta: 0,
+                stiva5: 0,        
+                stiva10: 900000,  
+                totcompra: 900000,
+                liqiva5: 0,
+                liqiva10: 81818,  
+                totiva: 81818,
+                saldo: 0,
+                anulado: "NO"
+            },
+            {
+                idcompra: 2,
+                idproveedor: 2, // MODAS LUZ S.A.
+                numfactura: "001-002-0008899",
+                timbrado: "99887766",
+                feccompra: "2026-05-12",
+                condicion: "CRÉDITO", // Esta sí aparecerá en tu gestión de vencimientos
+                stexenta: 0,
+                stiva5: 0,
+                stiva10: 1600000,
+                totcompra: 1600000,
+                liqiva5: 0,
+                liqiva10: 145455, 
+                totiva: 145455,
+                saldo: 1600000,   
+                anulado: "NO"
+            }
+        ];
+        var comprasdetalle = [
+            // Detalles Compra 1
+            { idcompradet: 1, idcompra: 1, item: 1, idarticulo: 2, cantidad: 2, preuni: 250000, tiva: 10, subtotal: 500000 },
+            { idcompradet: 2, idcompra: 1, item: 2, idarticulo: 1, cantidad: 4, preuni: 100000, tiva: 10, subtotal: 400000 },
+            // Detalles Compra 2
+            { idcompradet: 3, idcompra: 2, item: 1, idarticulo: 3, cantidad: 5, preuni: 120000, tiva: 10, subtotal: 600000 },
+            { idcompradet: 4, idcompra: 2, item: 2, idarticulo: 10, cantidad: 2, preuni: 500000, tiva: 10, subtotal: 1000000 }
+        ];
+
+        // Guardar en localStorage como cadena JSON
+        localStorage.setItem("comprascabecera", JSON.stringify(comprascabecera));
+        localStorage.setItem("comprasdetalle", JSON.stringify(comprasdetalle));
+    }
+    //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
 
     // CREAR UN ARRAY de objetos: clientes-----------------------------------------

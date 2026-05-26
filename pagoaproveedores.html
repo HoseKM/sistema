@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago a Proveedores | Punto Elegancia</title>
+        <link rel="icon" type="image/png" href="img/working.png">
+        <script src="js/seguridad.js"></script>
+        <!-- ESTILOS DEL MENU -->
+        <link href="menu/styles.css" rel="stylesheet" />
+        
+    
+        <!-- BOOTSTRAP ICONS -->
+        <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+        <!-- DATATABLES -->
+        <link rel="stylesheet" href="dt/datatables.min.css">
+        <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+        <!-- ALERTIFYJS -->
+        <link rel="stylesheet" href="alert/alertify.min.css">
+        <link rel="stylesheet" href="alert/themes/default.min.css">
+        <script src="alert/alertify.min.js"></script>
+</head>
+<body class="sb-nav-fixed">
+
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+         
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-2">Pago a Proveedores</h1>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="bi bi-cash-stack"></i> Gestión de pagos</div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label fw-bold">Proveedor</label>
+                                    <div class="input-group">
+                                        <input type="text" id="pag_proveedor" class="form-control" readonly>
+                                        <button class="btn btn-primary" onclick="abrirModalProveedor()">F2</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table id="tablaPagos" class="table table-bordered table-striped" style="width:100%">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Sel.</th>
+                                        <th>N° Factura</th>
+                                        <th>Fecha</th>
+                                        <th>Monto Total</th>
+                                        <th>Saldo Pendiente</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+        <script src="js/funcionesSistema.js"></script>
+        <!-- MENU -->
+        <script src="menu/bootstrap.bundle.min.js"></script>
+        <script src="menu/scripts.js"></script>
+        <!-- DATATABLES -->
+        <script src="dt/jquery-3.7.1.js"></script>
+        <script src="dt/datatables.min.js"></script>
+        <script src="dt/jquery.dataTables.min.js"></script>
+        <!-- DATATABLES Buttons extension -->
+        <script src="dt/dataTables.buttons.min.js"></script>
+        <script src="dt/buttons.print.min.js"></script>
+        <script src="dt/buttons.html5.min.js"></script>
+        <!-- DATATABLES JSZip y pdfmake para exportar -->
+        <script src="dt/jszip.min.js"></script>
+        <script src="dt/pdfmake.min.js"></script>
+        <script src="dt/vfs_fonts.js"></script>
+        <!-- DATATABLES Idioma Español -->
+        <script src="dt/es-ES.js"></script>
+
+    <script>
+        // Esta función es la que hace aparecer el menú que te faltaba
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComponentes(); 
+        });
+    </script>
+</body>
+</html>
