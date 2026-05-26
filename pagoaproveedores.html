@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Pago a Proveedores | Punto Elegancia</title>
-        <link rel="icon" type="image/png" href="img/working.png">
-        <script src="js/seguridad.js"></script>
-        <!-- ESTILOS DEL MENU -->
-        <link href="menu/styles.css" rel="stylesheet" />
-        
+    <link rel="icon" type="image/png" href="img/working.png">
+    <script src="js/seguridad.js"></script>
     
-        <!-- BOOTSTRAP ICONS -->
-        <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+    <!-- ESTILOS DEL MENU -->
+    <link href="menu/styles.css" rel="stylesheet" />
+  
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
 
-        <!-- DATATABLES -->
-        <link rel="stylesheet" href="dt/datatables.min.css">
-        <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
-        <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="dt/datatables.min.css">
+    <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
 
-        <!-- ALERTIFYJS -->
-        <link rel="stylesheet" href="alert/alertify.min.css">
-        <link rel="stylesheet" href="alert/themes/default.min.css">
-        <script src="alert/alertify.min.js"></script>
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <script src="dt/dataTables.keyTable.min.js"></script>
+
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <link rel="stylesheet" href="dt/keyTable.dataTables.min.css">
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <script src="dt/dataTables.select.min.js"></script>
+    <link rel="stylesheet" href="dt/select.dataTables.min.css">
+
+    <!-- ALERTIFYJS -->
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+    <script src="alert/alertify.min.js"></script>
+
+
 </head>
 <body class="sb-nav-fixed">
 
@@ -31,32 +43,76 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-2">Pago a Proveedores</h1>
+                    <h1 class="mt-4">Pago a Proveedores</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active">Cancelación de Facturas a Crédito</li>
+                    </ol>
                     
-                    <div class="card mb-4">
-                        <div class="card-header"><i class="bi bi-cash-stack"></i> Gestión de pagos</div>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-dark text-white">
+                            <i class="bi bi-cash-stack me-1"></i> Formulario de Pagos
+                        </div>
                         <div class="card-body">
-                            <div class="row mb-3">
+                            <div class="row mb-4">
                                 <div class="col-sm-6">
-                                    <label class="form-label fw-bold">Proveedor</label>
+                                    <label class="form-label fw-bold">Proveedor a Pagar</label>
                                     <div class="input-group">
-                                        <input type="text" id="pag_proveedor" class="form-control" readonly>
-                                        <button class="btn btn-primary" onclick="abrirModalProveedor()">F2</button>
+                                        <button class="btn btn-primary" id="btnBuscarProv" title="Buscar Proveedor (F2)">
+                                            <i class="bi bi-search"></i> F2
+                                        </button>
+                                        <input type="text" id="pag_proveedor" class="form-control fw-bold text-uppercase" placeholder="Seleccione un proveedor..." readonly>
+                                        <input type="hidden" id="pag_idproveedor">
                                     </div>
                                 </div>
                             </div>
 
-                            <table id="tablaPagos" class="table table-bordered table-striped" style="width:100%">
+                            <div class="row mb-4 bg-light p-3 border rounded">
+                                <div class="col-sm-3">
+                                    <label class="form-label fw-bold">Fecha de Pago</label>
+                                    <input type="date" id="pag_fecha" class="form-control" required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="form-label fw-bold">Método de Pago</label>
+                                    <select id="pag_metodo" class="form-select" required>
+                                        <option value="EFECTIVO">EFECTIVO</option>
+                                        <option value="TRANSFERENCIA">TRANSFERENCIA BANCARIA</option>
+                                        <option value="CHEQUE">CHEQUE</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="form-label fw-bold">N° Comprobante/Recibo</label>
+                                    <input type="text" id="pag_comprobante" class="form-control" required placeholder="Ej: 001-5544">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="form-label fw-bold text-success">Total a Pagar</label>
+                                    <input type="text" id="pag_total_vista" class="form-control bg-white text-end fw-bold text-success fs-5" value="0 Gs." readonly>
+                                    <input type="hidden" id="pag_total_numero" value="0">
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-list-check"></i> Seleccione las facturas a cancelar:</h5>
+                            <table id="tablaPagos" class="table table-bordered table-hover" style="width:100%">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Sel.</th>
+                                        <th class="text-center" style="width: 50px;">Sel.</th>
                                         <th>N° Factura</th>
-                                        <th>Fecha</th>
-                                        <th>Monto Total</th>
+                                        <th>Timbrado</th>
+                                        <th>Vencimiento</th>
                                         <th>Saldo Pendiente</th>
-                                    </tr>
+                                        <th>IdCompra</th> </tr>
                                 </thead>
+                                <tbody>
+                                    </tbody>
                             </table>
+
+                            <div class="row mt-4">
+                                <div class="col-sm-12 text-end">
+                                    <button type="button" id="btnGuardarPago" class="btn btn-success btn-lg fw-bold shadow">
+                                        <i class="bi bi-check-circle"></i> REGISTRAR PAGO
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -64,30 +120,258 @@
         </div>
     </div>
 
-        <script src="js/funcionesSistema.js"></script>
-        <!-- MENU -->
-        <script src="menu/bootstrap.bundle.min.js"></script>
-        <script src="menu/scripts.js"></script>
-        <!-- DATATABLES -->
-        <script src="dt/jquery-3.7.1.js"></script>
-        <script src="dt/datatables.min.js"></script>
-        <script src="dt/jquery.dataTables.min.js"></script>
-        <!-- DATATABLES Buttons extension -->
-        <script src="dt/dataTables.buttons.min.js"></script>
-        <script src="dt/buttons.print.min.js"></script>
-        <script src="dt/buttons.html5.min.js"></script>
-        <!-- DATATABLES JSZip y pdfmake para exportar -->
-        <script src="dt/jszip.min.js"></script>
-        <script src="dt/pdfmake.min.js"></script>
-        <script src="dt/vfs_fonts.js"></script>
-        <!-- DATATABLES Idioma Español -->
-        <script src="dt/es-ES.js"></script>
+    <div class="modal fade" id="modalBuscarProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-search"></i> Buscar Proveedor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="tablaModalProveedores" class="display table table-striped" style="width:100%">
+                        <thead class="table-light">
+                             <tr>
+                                  <th>Id</th>
+                                  <th>R.U.C.</th>
+                                  <th>Razón Social</th>
+                                  <th>Acción</th>
+                             </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/funcionesSistema.js"></script>
+    <!-- MENU -->
+    <script src="menu/bootstrap.bundle.min.js"></script>
+    <script src="menu/scripts.js"></script>
+    <!-- DATATABLES -->
+    <script src="dt/jquery-3.7.1.js"></script>
+    <script src="dt/jquery.dataTables.min.js"></script>
+    <script src="dt/datatables.min.js"></script>
+
+
+    <!-- DATATABLES Buttons extension -->
+    <script src="dt/dataTables.buttons.min.js"></script>
+    <script src="dt/buttons.print.min.js"></script>
+    <script src="dt/buttons.html5.min.js"></script>
+    <!-- DATATABLES JSZip y pdfmake para exportar -->
+    <script src="dt/jszip.min.js"></script>
+    <script src="dt/pdfmake.min.js"></script>
+    <script src="dt/vfs_fonts.js"></script>
+    <!-- DATATABLES Idioma Español -->
+    <script src="dt/es-ES.js"></script>
 
     <script>
-        // Esta función es la que hace aparecer el menú que te faltaba
         document.addEventListener("DOMContentLoaded", function() {
             cargarComponentes(); 
+            
+            // Fecha por defecto: HOY
+            const hoy = new Date().toISOString().split("T")[0];
+            document.getElementById("pag_fecha").value = hoy;
+            document.getElementById("pag_fecha").max = hoy;
+
+            inicializarTablaPagos();
+            inicializarTablaProveedores();
         });
+
+        let tablaFacturas; // Variable global para la tabla principal
+
+        function inicializarTablaPagos() {
+            tablaFacturas = $('#tablaPagos').DataTable({
+                language: spanish,
+                paging: false,
+                searching: false,
+                info: false,
+                columnDefs: [
+                    { className: "text-center", targets: [0, 2, 3] },
+                    { className: "text-end fw-bold text-danger", targets: [4] },
+                    { targets: [5], visible: false } // Ocultamos el ID de la compra
+                ]
+            });
+        }
+
+        // ==============================================================================
+        // LÓGICA DEL MODAL DE PROVEEDORES (F2)
+        // ==============================================================================
+        function inicializarTablaProveedores() {
+            let proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
+            
+            $('#tablaModalProveedores').DataTable({
+                data: proveedores,
+                language: spanish,
+                pageLength: 5,
+                columns: [
+                    { data: 'idproveedor' },
+                    { data: 'ruc' },
+                    { data: 'tabla_proveedores' },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `<button class="btn btn-sm btn-success btn-seleccionar-prov" data-id="${row.idproveedor}" data-nom="${row.tabla_proveedores}"><i class="bi bi-check2-square"></i> Elegir</button>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        // Abrir Modal con F2 o Botón
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F2') {
+                e.preventDefault(); 
+                new bootstrap.Modal(document.getElementById('modalBuscarProveedor')).show();
+            }
+        });
+        document.getElementById('btnBuscarProv').addEventListener('click', function() {
+            new bootstrap.Modal(document.getElementById('modalBuscarProveedor')).show();
+        });
+
+        // Seleccionar Proveedor del Modal
+        $(document).on('click', '.btn-seleccionar-prov', function() {
+            let id = $(this).data('id');
+            let nombre = $(this).data('nom');
+            
+            document.getElementById('pag_idproveedor').value = id;
+            document.getElementById('pag_proveedor').value = nombre;
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalBuscarProveedor')).hide();
+            
+            cargarFacturasPendientes(id);
+        });
+
+        // ==============================================================================
+        // CARGAR FACTURAS PENDIENTES (CRÉDITO Y CONTADO)
+        // ==============================================================================
+        function cargarFacturasPendientes(idproveedor) {
+            tablaFacturas.clear().draw();
+            document.getElementById('pag_total_vista').value = "0 Gs.";
+            document.getElementById('pag_total_numero').value = 0;
+
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            // Traemos el historial de pagos para saber qué facturas al contado ya se pagaron
+            let pagos = JSON.parse(localStorage.getItem("pagos_proveedores")) || [];
+            
+            // FILTRO INTELIGENTE:
+            let pendientes = compras.filter(c => {
+                // Descartar facturas de otros proveedores o que estén anuladas
+                if (c.idproveedor != idproveedor || c.anulado === "SI") return false;
+                
+                // 1. Si es CRÉDITO y aún debe dinero, entra a la lista
+                if (c.condicion === "CRÉDITO" && c.saldo > 0) return true;
+                
+                // 2. Si es CONTADO, validamos que aún NO tenga un recibo de pago generado
+                if (c.condicion === "CONTADO") {
+                    let yaPagado = pagos.some(p => p.facturas_canceladas.includes(c.idcompra));
+                    return !yaPagado; // Si NO está pagado, entra a la lista
+                }
+                
+                return false;
+            });
+
+            if (pendientes.length === 0) {
+                alertify.warning("Este proveedor no tiene facturas pendientes de pago.");
+                return;
+            }
+
+            pendientes.forEach(c => {
+                // Como las de CONTADO se guardaron con saldo 0, usamos su total de compra como la deuda a pagar hoy
+                let deudaReal = (c.condicion === "CONTADO") ? c.totcompra : c.saldo;
+                
+                let check = `<input class="form-check-input check-pago" type="checkbox" data-saldo="${deudaReal}" data-idcompra="${c.idcompra}" style="transform: scale(1.5);">`;
+                
+                // Si es al contado, su vencimiento es inmediato
+                let vencimiento = c.fechavencimiento ? c.fechavencimiento : (c.condicion === "CONTADO" ? "Pago Inmediato" : "Sin gestionar");
+                let timbrado = c.timbrado ? c.timbrado : "---";
+
+                // Le agregamos una etiqueta visual al N° de factura para diferenciar Contado de Crédito fácilmente
+                let badgeClass = c.condicion === "CONTADO" ? "bg-info text-dark" : "bg-warning text-dark";
+                let numFacturaHtml = `${c.numfactura} <br><span class="badge ${badgeClass} mt-1">${c.condicion}</span>`;
+
+                tablaFacturas.row.add([
+                    check,
+                    numFacturaHtml,
+                    timbrado,
+                    vencimiento,
+                    deudaReal.toLocaleString('es-PY') + " Gs.",
+                    c.idcompra
+                ]);
+            });
+
+            tablaFacturas.draw();
+        }
+
+        // ==============================================================================
+        // SUMAR TOTAL AL MARCAR/DESMARCAR FACTURAS
+        // ==============================================================================
+        $(document).on('change', '.check-pago', function() {
+            let totalSuma = 0;
+            // Recorrer todos los checkboxes que estén marcados
+            $('.check-pago:checked').each(function() {
+                totalSuma += parseInt($(this).data('saldo'));
+            });
+
+            // Mostrar en pantalla
+            document.getElementById('pag_total_vista').value = totalSuma.toLocaleString('es-PY') + " Gs.";
+            document.getElementById('pag_total_numero').value = totalSuma;
+        });
+
+        // ==============================================================================
+        // GUARDAR EL PAGO Y ACTUALIZAR SALDOS
+        // ==============================================================================
+        document.getElementById('btnGuardarPago').addEventListener('click', function() {
+            let idproveedor = document.getElementById('pag_idproveedor').value;
+            let fecha = document.getElementById('pag_fecha').value;
+            let metodo = document.getElementById('pag_metodo').value;
+            let comprobante = document.getElementById('pag_comprobante').value.trim();
+            let total = parseInt(document.getElementById('pag_total_numero').value);
+
+            // Validaciones
+            if (!idproveedor) { alertify.error("Debe seleccionar un proveedor (F2)."); return; }
+            if (!fecha || !comprobante) { alertify.error("Debe completar la Fecha y el N° de Comprobante."); return; }
+            if (total <= 0) { alertify.error("Debe marcar al menos una factura para pagar."); return; }
+
+            // 1. Obtener las facturas seleccionadas en la tabla
+            let facturasAPagar = [];
+            $('.check-pago:checked').each(function() {
+                facturasAPagar.push(parseInt($(this).data('idcompra')));
+            });
+
+            // 2. Descontar el saldo en la base de datos (comprascabecera)
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            
+            facturasAPagar.forEach(idPagado => {
+                let index = compras.findIndex(c => c.idcompra === idPagado);
+                if (index !== -1) {
+                    compras[index].saldo = 0; // Se paga el 100% de la factura seleccionada
+                }
+            });
+
+            localStorage.setItem("comprascabecera", JSON.stringify(compras));
+
+            // 3. Registrar el historial en la tabla de pagos (para futuros reportes)
+            let pagos = JSON.parse(localStorage.getItem("pagos_proveedores")) || [];
+            let nuevoPago = {
+                idpago: pagos.length > 0 ? Math.max(...pagos.map(p => p.idpago)) + 1 : 1,
+                idproveedor: parseInt(idproveedor),
+                fecha_pago: fecha,
+                metodo: metodo,
+                comprobante: comprobante,
+                monto_total: total,
+                facturas_canceladas: facturasAPagar // Guarda qué facturas mató este pago
+            };
+            pagos.push(nuevoPago);
+            localStorage.setItem("pagos_proveedores", JSON.stringify(pagos));
+
+            // Éxito y Limpieza
+            alertify.success("¡Pago registrado y saldos actualizados correctamente!");
+            
+            // Limpiar formulario y recargar facturas (las pagadas desaparecerán)
+            document.getElementById('pag_comprobante').value = "";
+            cargarFacturasPendientes(idproveedor);
+        });
+
     </script>
 </body>
 </html>
