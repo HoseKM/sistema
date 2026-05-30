@@ -228,13 +228,14 @@
           <script src="dt/es-ES.js"></script>
 
           <script>
-               //Al cargarse la página---------------------------------------------------------------------------
-               //Control de seguridad en la apertura de la página------------------------------------------------
+              // VERIFICACION DE SESION EN VIVO 
+              // Al cargar la página, verificamos si el nombre de usuario está presente en localStorage.   
                var nom = localStorage.getItem("nomUsuario");
                if (nom == "" || nom == null){
                     window.location.href = "error.html"; // Redirige al login
                }
-               //Fin del Control de seguridad en la apertura de la página----------------------------------------
+               //Fin del Control de seguridad en la apertura de la página
+               //----------------------------------------
                
                //------------------------------------------------------------------------------------------------
                // 1. SIMULACIÓN DE BASE DE DATOS CON LOCALSTORAGE

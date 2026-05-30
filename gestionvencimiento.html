@@ -6,7 +6,7 @@
     <title>Gestión de Vencimientos | Punto Elegancia</title>
     <script src="js/seguridad.js"></script>
     <!-- ESTILOS DEL MENU -->
-    <link href="menu/styles.css" rel="stylesheet" />
+    <link href="menu/styles.css" rel="stylesheet"/>
   
     <!-- BOOTSTRAP ICONS -->
     <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
@@ -61,12 +61,19 @@
                                         <th>Fecha Compra</th> 
                                         <th>Monto Deuda</th> 
                                         <th>Plazo</th>
-                                        <th>Vencimiento</th>s
+                                        <th>Vencimiento</th>
                                         <th>Acción</th> </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
                             </table>
+                            <div class="row mt-4 border-top pt-3">
+                                <div class="col-sm-12 text-end">
+                                    <button type="button" id="btnConfirmarVencimientos" class="btn btn-success btn-lg fw-bold shadow-sm">
+                                        <i class="bi bi-send-check"></i> GUARDAR Y ENVIAR A PAGOS
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -264,6 +271,41 @@
             } else {
                 alertify.error("Error: No se encontró la compra en la base de datos.");
             }
+        });
+        // ==============================================================================
+        // 5. GUARDAR TODOS LOS VENCIMIENTOS Y ENVIAR A PAGOS
+        // ==============================================================================
+        document.getElementById('btnConfirmarVencimientos').addEventListener('click', function() {
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            
+            // Filtramos las facturas a crédito que se están mostrando en esta pantalla
+            let creditos = compras.filter(c => c.condicion === "CRÉDITO" && c.anulado !== "SI" && c.saldo > 0);
+            
+            if (creditos.length === 0) {
+                alertify.warning("No hay facturas a crédito pendientes por gestionar.");
+                return;
+            }
+
+            // CANDADO: Verificamos si hay ALGUNA que no tenga fecha de vencimiento
+            let sinGestionar = creditos.filter(c => !c.fechavencimiento || !c.plazo);
+            
+            if (sinGestionar.length > 0) {
+                alertify.error(`❌ Error: No puede continuar. Faltan ${sinGestionar.length} facturas por asignar plazo.`);
+                return;
+            }
+
+            // Si pasa el candado, otorgamos la "Autorización" a todas las facturas
+            creditos.forEach(c => {
+                let index = compras.findIndex(x => x.idcompra === c.idcompra);
+                compras[index].vencimiento_procesado = "SI"; // La bandera que pide la pantalla de pagos
+            });
+            
+            // Guardamos en la base de datos
+            localStorage.setItem("comprascabecera", JSON.stringify(compras));
+            
+            alertify.success("¡Vencimientos autorizados!");
+            
+            
         });
     </script>
 </body>

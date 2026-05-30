@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Compras | Punto Elegancia</title>
+    <script src="js/seguridad.js"></script>
+    <link rel="icon" type="image/png" href="img/working.png">
+     <!-- ESTILOS DEL MENU -->
+    <link href="menu/styles.css" rel="stylesheet" />
+  
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="dt/datatables.min.css">
+    <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <script src="dt/dataTables.keyTable.min.js"></script>
+
+    <!-- KEYTABLE PARA NEVEGAR CON EL TECLADO -->
+    <link rel="stylesheet" href="dt/keyTable.dataTables.min.css">
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <!-- SELECT PARA SELECCIONAR UNA FILA CON ENTER -->
+    <script src="dt/dataTables.select.min.js"></script>
+    <link rel="stylesheet" href="dt/select.dataTables.min.css">
+
+    <!-- ALERTIFYJS -->
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+    <script src="alert/alertify.min.js"></script>
+</head>
+<body class="sb-nav-fixed">
+
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+         
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Reporte General de Compras</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active">Libro de Compras</li>
+                    </ol>
+                    
+                    <div class="card mb-4 shadow-sm border-dark">
+                        <div class="card-header bg-dark text-white">
+                            <i class="bi bi-collection me-1"></i> Historial de Facturas Registradas
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaReporteCompras" class="table table-bordered table-hover" style="width:100%">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Fecha</th>
+                                        <th>Proveedor</th>
+                                        <th>N° Factura</th>
+                                        <th>Timbrado</th>
+                                        <th>Condición</th>
+                                        <th>Total Factura</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                                <tfoot>
+                                    <tr class="bg-light fw-bold text-end">
+                                        <td colspan="6">TOTAL ACUMULADO EN COMPRAS:</td>
+                                        <td id="totalInversion" class="text-primary fs-5">0 Gs.</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/funcionesSistema.js"></script>
+    <!-- MENU -->
+    <script src="menu/bootstrap.bundle.min.js"></script>
+    <script src="menu/scripts.js"></script>
+    <!-- DATATABLES -->
+    <script src="dt/jquery-3.7.1.js"></script>
+    <script src="dt/jquery.dataTables.min.js"></script>
+    <script src="dt/datatables.min.js"></script>
+
+
+    <!-- DATATABLES Buttons extension -->
+    <script src="dt/dataTables.buttons.min.js"></script>
+    <script src="dt/buttons.print.min.js"></script>
+    <script src="dt/buttons.html5.min.js"></script>
+    <!-- DATATABLES JSZip y pdfmake para exportar -->
+    <script src="dt/jszip.min.js"></script>
+    <script src="dt/pdfmake.min.js"></script>
+    <script src="dt/vfs_fonts.js"></script>
+    <!-- DATATABLES Idioma Español -->
+    <script src="dt/es-ES.js"></script> 
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComponentes(); 
+            generarReporteCompras();
+        });
+
+        function generarReporteCompras() {
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            let proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
+            let sumaTotal = 0;
+
+            let tabla = $('#tablaReporteCompras').DataTable({
+                language: spanish,
+                // AQUÍ ESTÁ LA MAGIA SIN CSS: Usamos las clases de Bootstrap para dividir en 2 columnas de 6.
+                // La segunda columna usa 'd-flex justify-content-end' para empujar el buscador a la derecha.
+                dom: "<'row mb-3'<'col-sm-6'B><'col-sm-6 d-flex justify-content-end'f>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                buttons: [
+                    { extend: 'excelHtml5', text: '<i class="bi bi-file-earmark-excel"></i> Excel', className: 'btn btn-success btn-sm' },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                        className: 'btn btn-danger btn-sm',
+                        filename: 'Reporte de Compras', 
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6] // 7 columnas
+                        },
+                        title: '', 
+                        customize: function (doc) {
+                            const now = new Date();
+                            const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                            const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                            doc.content.splice(0, 0, {
+                                margin: [0, 0, 0, 12], 
+                                table: {
+                                    widths: [100, '*', 'auto'], 
+                                    body: [
+                                        [
+                                            { text: 'PUNTO\nELEGANCIA', fontSize: 14, bold: true, color: '#4e73df', alignment: 'center' },
+                                            {
+                                                stack: [
+                                                    { text: 'LIBRO GENERAL DE COMPRAS', fontSize: 16, bold: true },
+                                                    { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
+                                                    { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                                ],
+                                                alignment: 'left', margin: [10, 0, 0, 0]
+                                            },
+                                            {
+                                                stack: [
+                                                    { text: 'REPORTE COMPRAS', fontSize: 12, bold: true, alignment: 'right' },
+                                                    { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                    { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                ]
+                                            }
+                                        ]
+                                    ]
+                                },
+                                layout: 'noBorders' 
+                            });
+
+                            var objLayout = {};
+                            objLayout['hLineWidth'] = function(i) { return 0.5; };
+                            objLayout['vLineWidth'] = function(i) { return 0.5; };
+                            objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                            objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                            objLayout['paddingLeft'] = function(i) { return 4; };
+                            objLayout['paddingRight'] = function(i) { return 4; };
+                            doc.content[1].layout = objLayout; 
+
+                            if (doc.content[1].table !== undefined) {
+                                const tableNode = doc.content[1];
+                                if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                    // 7 Anchos: El Proveedor (índice 2) se expande
+                                    tableNode.table.widths = ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto'];
+                                }
+                            }
+
+                            doc.footer = function(currentPage, pageCount) {
+                                return {
+                                    columns: [
+                                        { alignment: 'left', text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'), margin: [40, 10], fontSize: 8 },
+                                        { alignment: 'right', text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(), margin: [40, 10], fontSize: 8 }
+                                    ]
+                                };
+                            };
+                        }
+                    },
+                    { extend: 'print', text: '<i class="bi bi-printer"></i> Imprimir', className: 'btn btn-secondary btn-sm' }
+                ],
+                columnDefs: [
+                    { className: "text-center", targets: [0, 1, 4, 5] },
+                    { className: "text-end fw-bold", targets: [6] }
+                ],
+                order: [[0, 'desc']] // Más recientes primero
+            });
+
+            compras.forEach(c => {
+                if (c.anulado !== "SI") {
+                    let prov = proveedores.find(p => p.idproveedor == c.idproveedor);
+                    let nomProv = prov ? prov.tabla_proveedores || prov.razonsocial : "DESCONOCIDO";
+                    let timbradoFact = c.timbrado ? c.timbrado : "---";
+                    let badgeColor = c.condicion === "CONTADO" ? "bg-info text-dark" : "bg-warning text-dark";
+
+                    tabla.row.add([
+                        c.idcompra,
+                        c.feccompra,
+                        nomProv,
+                        c.numfactura,
+                        timbradoFact,
+                        `<span class="badge ${badgeColor}">${c.condicion}</span>`,
+                        c.totcompra.toLocaleString('es-PY') + " Gs."
+                    ]);
+
+                    sumaTotal += c.totcompra;
+                }
+            });
+
+            tabla.draw();
+            document.getElementById('totalInversion').textContent = sumaTotal.toLocaleString('es-PY') + " Gs.";
+        }
+    </script>
+</body>
+</html>

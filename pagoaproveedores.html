@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="form-label fw-bold">N° Comprobante/Recibo</label>
-                                    <input type="text" id="pag_comprobante" class="form-control" required placeholder="Ej: 001-5544">
+                                    <input type="text" id="pag_comprobante" class="form-control" required placeholder="001-0000" maxlength="8">
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="form-label fw-bold text-success">Total a Pagar</label>
@@ -176,7 +176,25 @@
             inicializarTablaPagos();
             inicializarTablaProveedores();
         });
-
+        // ==============================================================================
+        // MÁSCARA AUTOMÁTICA PARA EL N° DE COMPROBANTE (000-0000)
+        // ==============================================================================
+        document.getElementById("pag_comprobante").addEventListener("input", function (e) {
+            // 1. Quitar todo lo que no sea número
+            let valor = e.target.value.replace(/\D/g, ""); 
+            let formateado = "";
+            
+            // 2. Construir el formato agregando el guion dinámicamente
+            if (valor.length > 0) {
+                formateado += valor.substring(0, 3); // Primeros 3 dígitos (Ej: 001)
+            }
+            if (valor.length >= 4) {
+                formateado += "-" + valor.substring(3, 7); // Siguientes 4 dígitos (Ej: 0000)
+            }
+            
+            // 3. Asignar el valor formateado de vuelta al input
+            e.target.value = formateado;
+        });
         let tablaFacturas; // Variable global para la tabla principal
 
         function inicializarTablaPagos() {
@@ -258,8 +276,8 @@
                 // Descartar facturas de otros proveedores o que estén anuladas
                 if (c.idproveedor != idproveedor || c.anulado === "SI") return false;
                 
-                // 1. Si es CRÉDITO y aún debe dinero, entra a la lista
-                if (c.condicion === "CRÉDITO" && c.saldo > 0) return true;
+                // 1. Si es CRÉDITO, debe dinero Y tiene la bandera de autorización, entra a la lista
+                if (c.condicion === "CRÉDITO" && c.saldo > 0 && c.vencimiento_procesado === "SI") return true;
                 
                 // 2. Si es CONTADO, validamos que aún NO tenga un recibo de pago generado
                 if (c.condicion === "CONTADO") {
@@ -327,10 +345,21 @@
             let comprobante = document.getElementById('pag_comprobante').value.trim();
             let total = parseInt(document.getElementById('pag_total_numero').value);
 
-            // Validaciones
+        
+           // Validaciones básicas de campos vacíos
             if (!idproveedor) { alertify.error("Debe seleccionar un proveedor (F2)."); return; }
             if (!fecha || !comprobante) { alertify.error("Debe completar la Fecha y el N° de Comprobante."); return; }
             if (total <= 0) { alertify.error("Debe marcar al menos una factura para pagar."); return; }
+            // ==============================================================================
+            // VALIDACIÓN ESTRICTA DE FORMATO 000-0000 (8 caracteres en total)
+            // ==============================================================================
+            const regexComprobante = /^\d{3}-\d{4}$/;
+            if (!regexComprobante.test(comprobante)) {
+                alertify.error("⚠️ El N° de Comprobante debe tener el formato completo (000-0000).");
+                document.getElementById("pag_comprobante").focus();
+                return; // Frena el proceso de guardado
+            }
+            
 
             // 1. Obtener las facturas seleccionadas en la tabla
             let facturasAPagar = [];

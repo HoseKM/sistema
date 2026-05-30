@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajuste de Stock | Punto Elegancia</title>
+    <link rel="icon" type="image/png" href="img/working.png">
+        <script src="js/seguridad.js"></script>
+        <!-- ESTILOS DEL MENU -->
+        <link href="menu/styles.css" rel="stylesheet" />
+        
+    
+        <!-- BOOTSTRAP ICONS -->
+        <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+
+        <!-- DATATABLES -->
+        <link rel="stylesheet" href="dt/datatables.min.css">
+        <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+        <!-- ALERTIFYJS -->
+        <link rel="stylesheet" href="alert/alertify.min.css">
+        <link rel="stylesheet" href="alert/themes/default.min.css">
+        <script src="alert/alertify.min.js"></script>
+</head>
+<body class="sb-nav-fixed">
+
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+         
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Ajuste de Stock</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active">Control de Inventario</li>
+                    </ol>
+                    
+                    <div class="card mb-4 shadow-sm border-primary">
+                        <div class="card-header bg-primary text-white fw-bold">
+                            <i class="bi bi-boxes me-1"></i> Registrar Nuevo Ajuste
+                        </div>
+                        <div class="card-body">
+                            <form id="formAjuste">
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <label class="form-label fw-bold">Fecha</label>
+                                        <input type="date" id="aj_fecha" class="form-control" required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="form-label fw-bold text-danger">Tipo de Ajuste</label>
+                                        <select id="aj_tipo" class="form-select border-danger fw-bold" required>
+                                            <option value="" selected disabled>Seleccione...</option>
+                                            <option value="ENTRADA">ENTRADA (+ Sumar al Stock)</option>
+                                            <option value="SALIDA">SALIDA (- Restar al Stock)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="form-label fw-bold">Motivo / Observación</label>
+                                        <input type="text" id="aj_motivo" class="form-control text-uppercase" placeholder="Ej: Mercadería dañada, Error de conteo..." required maxlength="100">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3 align-items-end">
+                                    <div class="col-sm-5">
+                                        <label class="form-label fw-bold">Artículo</label>
+                                        <div class="input-group">
+                                            <button type="button" class="btn btn-secondary" id="btnBuscarArt" title="Buscar Artículo (F3)">
+                                                <i class="bi bi-search"></i> F3
+                                            </button>
+                                            <input type="text" id="aj_articulo" class="form-control fw-bold" placeholder="Seleccione un artículo..." readonly>
+                                            <input type="hidden" id="aj_idarticulo">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="form-label fw-bold">Stock Actual</label>
+                                        <input type="text" id="aj_stockactual" class="form-control text-center bg-light fw-bold" readonly placeholder="0">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="form-label fw-bold text-success">Cant. a Ajustar</label>
+                                        <input type="number" id="aj_cantidad" class="form-control text-center fw-bold border-success" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-sm-3 d-grid">
+                                        <button type="button" id="btnGuardarAjuste" class="btn btn-success fw-bold shadow">
+                                            <i class="bi bi-save"></i> GUARDAR AJUSTE
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-dark text-white">
+                            <i class="bi bi-clock-history me-1"></i> Historial de Ajustes Realizados
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaHistorialAjustes" class="table table-bordered table-striped" style="width:100%">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Artículo</th>
+                                        <th>Cantidad</th>
+                                        <th>Motivo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalBuscarArticulo" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title"><i class="bi bi-search"></i> Buscar Artículo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="tablaModalArticulos" class="display table table-hover" style="width:100%">
+                        <thead class="table-light">
+                             <tr>
+                                  <th>Id</th>
+                                  <th>Cód. Barra</th>
+                                  <th>Descripción</th>
+                                  <th>Stock Actual</th>
+                                  <th>Acción</th>
+                             </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <script src="js/funcionesSistema.js"></script>
+        <!-- MENU -->
+        <script src="menu/bootstrap.bundle.min.js"></script>
+        <script src="menu/scripts.js"></script>
+        <!-- DATATABLES -->
+        <script src="dt/jquery-3.7.1.js"></script>
+        <script src="dt/datatables.min.js"></script>
+        <script src="dt/jquery.dataTables.min.js"></script>
+        <!-- DATATABLES Buttons extension -->
+        <script src="dt/dataTables.buttons.min.js"></script>
+        <script src="dt/buttons.print.min.js"></script>
+        <script src="dt/buttons.html5.min.js"></script>
+        <!-- DATATABLES JSZip y pdfmake para exportar -->
+        <script src="dt/jszip.min.js"></script>
+        <script src="dt/pdfmake.min.js"></script>
+        <script src="dt/vfs_fonts.js"></script>
+        <!-- DATATABLES Idioma Español -->
+        <script src="dt/es-ES.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComponentes(); 
+            
+            // Forzar fecha actual por defecto
+            const hoy = new Date().toISOString().split("T")[0];
+            document.getElementById("aj_fecha").value = hoy;
+            document.getElementById("aj_fecha").max = hoy;
+
+            inicializarModalArticulos();
+            cargarHistorialAjustes();
+        });
+
+        // ==============================================================================
+        // 1. INICIALIZAR MODAL Y BÚSQUEDA DE ARTÍCULOS
+        // ==============================================================================
+        function inicializarModalArticulos() {
+            let articulos = JSON.parse(localStorage.getItem("articulos")) || [];
+            
+            $('#tablaModalArticulos').DataTable({
+                data: articulos,
+                language: spanish,
+                pageLength: 5,
+                columns: [
+                    { data: 'idarticulo' },
+                    { data: 'codbarra' },
+                    { data: 'descripcion' },
+                    { 
+                        data: 'stockactual',
+                        render: function(data) {
+                            // Colorea el stock en rojo si es 0
+                            return data > 0 ? `<span class="fw-bold">${data}</span>` : `<span class="text-danger fw-bold">0</span>`;
+                        }
+                    },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `<button class="btn btn-sm btn-secondary btn-seleccionar-art" 
+                                    data-id="${row.idarticulo}" 
+                                    data-desc="${row.descripcion}" 
+                                    data-stock="${row.stockactual}">
+                                    <i class="bi bi-check2-square"></i> Seleccionar</button>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        // Abrir modal con F3 o botón
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F3') {
+                e.preventDefault(); 
+                new bootstrap.Modal(document.getElementById('modalBuscarArticulo')).show();
+            }
+        });
+        document.getElementById('btnBuscarArt').addEventListener('click', function() {
+            new bootstrap.Modal(document.getElementById('modalBuscarArticulo')).show();
+        });
+
+        // Al hacer clic en Seleccionar en el modal
+        $(document).on('click', '.btn-seleccionar-art', function() {
+            document.getElementById('aj_idarticulo').value = $(this).data('id');
+            document.getElementById('aj_articulo').value = $(this).data('desc');
+            document.getElementById('aj_stockactual').value = $(this).data('stock');
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalBuscarArticulo')).hide();
+            document.getElementById('aj_cantidad').focus();
+        });
+
+        // ==============================================================================
+        // 2. GUARDAR EL AJUSTE Y RECALCULAR STOCK
+        // ==============================================================================
+        document.getElementById('btnGuardarAjuste').addEventListener('click', function() {
+            let fecha = document.getElementById('aj_fecha').value;
+            let tipo = document.getElementById('aj_tipo').value;
+            let motivo = document.getElementById('aj_motivo').value.trim().toUpperCase();
+            let idArticulo = parseInt(document.getElementById('aj_idarticulo').value);
+            let cantidad = parseInt(document.getElementById('aj_cantidad').value);
+            let stockActual = parseInt(document.getElementById('aj_stockactual').value);
+
+            // Validaciones básicas
+            if (!tipo) { alertify.error("Debe seleccionar un Tipo de Ajuste."); return; }
+            if (!motivo) { alertify.error("Debe ingresar el Motivo del ajuste."); document.getElementById('aj_motivo').focus(); return; }
+            if (!idArticulo || isNaN(idArticulo)) { alertify.error("Debe seleccionar un artículo (F3)."); return; }
+            if (isNaN(cantidad) || cantidad <= 0) { alertify.error("La cantidad debe ser mayor a 0."); return; }
+
+            // LÓGICA DE NEGOCIO: Validar Salida Negativa
+            if (tipo === "SALIDA" && cantidad > stockActual) {
+                alertify.error(`❌ Error: No puede dar salida a ${cantidad} unidades. El stock actual es de solo ${stockActual}.`);
+                document.getElementById('aj_cantidad').focus();
+                return;
+            }
+
+            // 1. Procesar el cambio en la tabla principal de ARTICULOS
+            let articulos = JSON.parse(localStorage.getItem("articulos")) || [];
+            let indexArt = articulos.findIndex(a => a.idarticulo === idArticulo);
+            
+            if (indexArt !== -1) {
+                if (tipo === "ENTRADA") {
+                    articulos[indexArt].stockactual += cantidad; // Suma
+                } else if (tipo === "SALIDA") {
+                    articulos[indexArt].stockactual -= cantidad; // Resta
+                }
+                // Guardamos el stock actualizado
+                localStorage.setItem("articulos", JSON.stringify(articulos));
+            } else {
+                alertify.error("No se encontró el artículo en la base de datos.");
+                return;
+            }
+
+            // 2. Registrar el movimiento en el historial de ajustes
+            let ajustes = JSON.parse(localStorage.getItem("ajustes_stock")) || [];
+            let nuevoAjuste = {
+                idajuste: ajustes.length > 0 ? Math.max(...ajustes.map(a => a.idajuste)) + 1 : 1,
+                fecha: fecha,
+                tipo: tipo,
+                motivo: motivo,
+                idarticulo: idArticulo,
+                nombre_articulo: document.getElementById('aj_articulo').value,
+                cantidad: cantidad
+            };
+            ajustes.push(nuevoAjuste);
+            localStorage.setItem("ajustes_stock", JSON.stringify(ajustes));
+
+            // Éxito, recargar componentes
+            alertify.success(`¡Stock actualizado! El nuevo stock es ${articulos[indexArt].stockactual}`);
+            
+            // Limpiar formulario y recargar tablas
+            document.getElementById('formAjuste').reset();
+            document.getElementById("aj_fecha").value = new Date().toISOString().split("T")[0]; // Mantener fecha
+            document.getElementById("aj_idarticulo").value = "";
+            
+            cargarHistorialAjustes();
+            
+            // Actualizar la tabla del Modal F3 en segundo plano para que refleje el nuevo stock inmediatamente
+            if ($.fn.DataTable.isDataTable('#tablaModalArticulos')) {
+                $('#tablaModalArticulos').DataTable().clear().rows.add(articulos).draw();
+            }
+        });
+
+        // ==============================================================================
+        // 3. CARGAR EL HISTORIAL DE AJUSTES EN LA PANTALLA
+        // ==============================================================================
+        function cargarHistorialAjustes() {
+            let ajustes = JSON.parse(localStorage.getItem("ajustes_stock")) || [];
+            
+            let tabla;
+            if ($.fn.DataTable.isDataTable('#tablaHistorialAjustes')) {
+                tabla = $('#tablaHistorialAjustes').DataTable();
+                tabla.clear();
+            } else {
+                tabla = $('#tablaHistorialAjustes').DataTable({
+                    language: spanish,
+                    order: [[0, 'desc']], // Muestra el ajuste más reciente primero
+                    columnDefs: [
+                        { className: "text-center", targets: [0, 1, 2, 4] }
+                    ]
+                });
+            }
+
+            ajustes.forEach(a => {
+                let badgeTipo = a.tipo === "ENTRADA" ? `<span class="badge bg-success"><i class="bi bi-arrow-up-circle"></i> ENTRADA</span>` 
+                                                     : `<span class="badge bg-danger"><i class="bi bi-arrow-down-circle"></i> SALIDA</span>`;
+                
+                tabla.row.add([
+                    a.idajuste,
+                    a.fecha,
+                    badgeTipo,
+                    a.nombre_articulo,
+                    `<span class="fw-bold">${a.cantidad}</span>`,
+                    a.motivo
+                ]);
+            });
+
+            tabla.draw();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuentas por Pagar | Punto Elegancia</title>
+    <link rel="icon" type="image/png" href="img/working.png">
+
+    <script src="js/seguridad.js"></script>
+    <!-- ESTILOS DEL MENU -->
+    <link href="menu/styles.css" rel="stylesheet" />
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+    <!-- DATATABLES -->
+    <link rel="stylesheet" href="dt/datatables.min.css">
+    <link rel="stylesheet" href="dt/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="dt/buttons.dataTables.min.css">
+
+    <!-- ALERTIFYJS -->
+    <link rel="stylesheet" href="alert/alertify.min.css">
+    <link rel="stylesheet" href="alert/themes/default.min.css">
+    <script src="alert/alertify.min.js"></script>
+</head>
+<body class="sb-nav-fixed">
+
+    <div id="contenedor-navbar"></div>
+    <div id="layoutSidenav">
+        <div id="contenedor-sidebar"></div>
+         
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Crédito con Proveedores</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active">Cuentas por Pagar</li>
+                    </ol>
+                    
+                    <div class="card mb-4 shadow-sm border-danger">
+                        <div class="card-header bg-danger text-white fw-bold">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Estado de Deudas Pendientes
+                        </div>
+                        <div class="card-body">
+                            <table id="tablaReporteCredito" class="table table-bordered table-striped" style="width:100%">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Proveedor</th>
+                                        <th>N° Factura</th>
+                                        <th>Fecha Compra</th>
+                                        <th>Vencimiento</th>
+                                        <th>Total Factura</th>
+                                        <th>Saldo Pendiente</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                                <tfoot>
+                                    <tr class="bg-light fw-bold text-end">
+                                        <td colspan="5">DEUDA TOTAL PENDIENTE:</td>
+                                        <td id="totalDeuda" class="text-danger fs-5">0 Gs.</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+        <script src="js/funcionesSistema.js"></script>
+        <!-- MENU -->
+        <script src="menu/bootstrap.bundle.min.js"></script>
+        <script src="menu/scripts.js"></script>
+        <!-- DATATABLES -->
+        <script src="dt/jquery-3.7.1.js"></script>
+        <script src="dt/datatables.min.js"></script>
+        <script src="dt/jquery.dataTables.min.js"></script>
+        <!-- DATATABLES Buttons extension -->
+        <script src="dt/dataTables.buttons.min.js"></script>
+        <script src="dt/buttons.print.min.js"></script>
+        <script src="dt/buttons.html5.min.js"></script>
+        <!-- DATATABLES JSZip y pdfmake para exportar -->
+        <script src="dt/jszip.min.js"></script>
+        <script src="dt/pdfmake.min.js"></script>
+        <script src="dt/vfs_fonts.js"></script>
+        <!-- DATATABLES Idioma Español -->
+        <script src="dt/es-ES.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComponentes(); 
+            generarReporteCreditos();
+        });
+
+        function generarReporteCreditos() {
+            let compras = JSON.parse(localStorage.getItem("comprascabecera")) || [];
+            let proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
+            let deudaTotal = 0;
+
+            let tabla = $('#tablaReporteCredito').DataTable({
+                language: spanish,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'excelHtml5', text: '<i class="bi bi-file-earmark-excel"></i> Excel', className: 'btn btn-success btn-sm', title: 'Cuentas por Pagar - Proveedores' },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="bi bi-filetype-pdf"></i> Exportar a PDF',
+                        className: 'btn btn-danger btn-sm',
+                        filename: 'Reporte Cuentas por Pagar', 
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5] // 6 columnas
+                        },
+                        title: '', 
+                        customize: function (doc) {
+                            const now = new Date();
+                            const fecha = now.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                            const hora = now.toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                            doc.content.splice(0, 0, {
+                                margin: [0, 0, 0, 12], 
+                                table: {
+                                    widths: [100, '*', 'auto'], 
+                                    body: [
+                                        [
+                                            { text: 'PUNTO\nELEGANCIA', fontSize: 14, bold: true, color: '#4e73df', alignment: 'center' },
+                                            {
+                                                stack: [
+                                                    { text: 'REPORTE CUENTAS POR PAGAR', fontSize: 16, bold: true },
+                                                    { text: 'Venta de Ropa', fontSize: 10, color: '#666' },
+                                                    { text: 'Belén, Concepción - Paraguay', fontSize: 10, color: '#666' }
+                                                ],
+                                                alignment: 'left', margin: [10, 0, 0, 0]
+                                            },
+                                            {
+                                                stack: [
+                                                    { text: 'CRÉDITO PROVEEDORES', fontSize: 12, bold: true, alignment: 'right' },
+                                                    { text: 'Fecha: ' + fecha, fontSize: 10, alignment: 'right' },
+                                                    { text: 'Hora: ' + hora, fontSize: 10, alignment: 'right' }
+                                                ]
+                                            }
+                                        ]
+                                    ]
+                                },
+                                layout: 'noBorders' 
+                            });
+
+                            var objLayout = {};
+                            objLayout['hLineWidth'] = function(i) { return 0.5; };
+                            objLayout['vLineWidth'] = function(i) { return 0.5; };
+                            objLayout['hLineColor'] = function(i) { return '#aaaaaa'; };
+                            objLayout['vLineColor'] = function(i) { return '#aaaaaa'; };
+                            objLayout['paddingLeft'] = function(i) { return 4; };
+                            objLayout['paddingRight'] = function(i) { return 4; };
+                            doc.content[1].layout = objLayout; 
+
+                            if (doc.content[1].table !== undefined) {
+                                const tableNode = doc.content[1];
+                                if (tableNode.table.body && tableNode.table.body.length > 0) {
+                                    // 6 Anchos: El Proveedor (índice 0) se expande
+                                    tableNode.table.widths = ['*', 'auto', 'auto', 'auto', 'auto', 'auto'];
+                                }
+                            }
+
+                            doc.footer = function(currentPage, pageCount) {
+                                return {
+                                    columns: [
+                                        { alignment: 'left', text: 'Impreso por: ' + (localStorage.getItem("nomUsuario") || 'Sistema'), margin: [40, 10], fontSize: 8 },
+                                        { alignment: 'right', text: 'Pág. ' + currentPage.toString() + ' de ' + pageCount.toString(), margin: [40, 10], fontSize: 8 }
+                                    ]
+                                };
+                            };
+                        }
+                    },
+                    { extend: 'print', text: '<i class="bi bi-printer"></i> Imprimir', className: 'btn btn-secondary btn-sm', title: 'Cuentas por Pagar - Proveedores' }
+                ],
+                columnDefs: [
+                    { className: "text-center", targets: [2, 3] },
+                    { className: "text-end fw-bold", targets: [4] },
+                    { className: "text-end fw-bold text-danger", targets: [5] }
+                ],
+                order: [[0, 'asc']] // Ordenar alfabéticamente por proveedor
+            });
+
+            // Filtramos SOLO compras a crédito que aún tengan saldo mayor a 0 y no estén anuladas
+            let deudasPendientes = compras.filter(c => c.condicion === "CRÉDITO" && c.saldo > 0 && c.anulado !== "SI");
+
+            deudasPendientes.forEach(c => {
+                let prov = proveedores.find(p => p.idproveedor == c.idproveedor);
+                let nomProv = prov ? prov.tabla_proveedores || prov.razonsocial : "DESCONOCIDO";
+                let fechaVencimiento = c.fechavencimiento ? c.fechavencimiento : `<span class="badge bg-secondary">Sin gestionar</span>`;
+
+                tabla.row.add([
+                    nomProv,
+                    c.numfactura,
+                    c.feccompra,
+                    fechaVencimiento,
+                    c.totcompra.toLocaleString('es-PY') + " Gs.",
+                    c.saldo.toLocaleString('es-PY') + " Gs."
+                ]);
+
+                deudaTotal += c.saldo;
+            });
+
+            tabla.draw();
+            document.getElementById('totalDeuda').textContent = deudaTotal.toLocaleString('es-PY') + " Gs.";
+        }
+    </script>
+</body>
+</html>
